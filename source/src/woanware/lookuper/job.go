@@ -1,7 +1,13 @@
 package main
 
 import (
+	util "github.com/woanware/goutil"
 	"log"
+	"path"
+	"os"
+	"encoding/csv"
+	"strings"
+	"strconv"
 )
 
 // ##### Structs #######################################################################################################
@@ -40,42 +46,22 @@ func (j *Job) Load() {
 	j.AreApiKeysPrivate = job.AreApiKeysPrivate
 }
 
-//// Creates a zip file containing the results CSV files for a job
-//func (j *Job) GenerateCsv(outputFilePath string) {
-//	//buf := new(bytes.Buffer)
-//
-//	var tempCsv []byte
-//	switch j.Type {
-//	case dataTypeMd5Vt:
-//		tempCsv = j.GenerateJobCsvForVtHashes(false)
-		//err := createAndWriteZipFile(zipWriter, FILE_NAME_HASHES, j.Id, tempCsv, true)
-		//if err != nil {
-		//	//return fmt.Errorf("Error creating CSV results zip file (%d): %v", j.Id, err), []byte{}
-		//}
+// Creates a zip file containing the results CSV files for a job
+func (j *Job) GenerateCsv(outputFilePath string) {
 
-	//case dataTypeSha256Vt:
-	//	_,_, tempCsv := j.GenerateJobCsvForHashesVt(config.DataFolder, true)
-	//	err := createAndWriteZipFile(zipWriter, FILE_NAME_HASHES, j.Id, tempCsv, true)
-	//	if err != nil {
-	//		//return fmt.Errorf("Error creating CSV results zip file (%d): %v", j.Id, err), []byte{}
-	//	}
-	//
-	//case dataTypeUrlVt:
-	//	_,_, tempCsv := j.GenerateJobCsvForUrls(config.DataFolder)
-	//	err := createAndWriteZipFile(zipWriter, FILE_NAME_URLS, j.Id, tempCsv, true)
-	//	if err != nil {
-	//		//return fmt.Errorf("Error creating CSV results zip file (%d): %v", j.Id, err), []byte{}
-	//	}
-	//
-	//case dataTypeUrlG:
-	//	_,_, tempCsv := j.GenerateJobCsvForUrlsG(config.DataFolder)
-	//	err := createAndWriteZipFile(zipWriter, FILE_NAME_URLS, j.Id, tempCsv, true)
-	//	if err != nil {
-	//		//return fmt.Errorf("Error creating CSV results zip file (%d): %v", j.Id, err), []byte{}
-	//	}
-	//	return nil, buf.Bytes()
-	//
-	//case dataTypeIpVt:
+	switch j.Type {
+	case dataTypeMd5Vt:
+		j.OutputVtHashCsv(outputFilePath, false)
+
+	case dataTypeSha256Vt:
+		j.OutputVtHashCsv(outputFilePath, true)
+
+	case dataTypeUrlVt:
+		j.OutputVtUrls(outputFilePath)
+
+	case dataTypeIpVt:
+		j.OutputVtIps(outputFilePath)
+
 	//	_,_, tempCsvRes, tempCsvDu := j.GenerateJobCsvForIps(config.DataFolder)
 	//	err := createAndWriteZipFile(zipWriter, FILE_NAME_IP_RESOLUTIONS, j.Id, tempCsvRes, false)
 	//	if err != nil {
@@ -106,61 +92,138 @@ func (j *Job) Load() {
 	//	if err != nil {
 	//		//return fmt.Errorf("Error creating CSV results zip file (%d): %v", j.Id, err), []byte{}
 	//	}
-//	}
-//}
+	//case dataTypeUrlG:
+	//	_,_, tempCsv := j.GenerateJobCsvForUrlsG(config.DataFolder)
+	//	err := createAndWriteZipFile(zipWriter, FILE_NAME_URLS, j.Id, tempCsv, true)
+	//	if err != nil {
+	//		//return fmt.Errorf("Error creating CSV results zip file (%d): %v", j.Id, err), []byte{}
+	//	}
+	//	return nil, buf.Bytes()
+	//
+	}
+}
 
-//// Creates a CSV results file for hash jobs, also returns the total number and number of positive hashes
-//func (j *Job) GenerateJobCsvForVtHashes(dataFolder string, isSha256 bool) (csvData []byte) {
-//
-//	data, err := loadJobData(j.Id, dataFolder)
-//	if err != nil {
-//		log.Errorf("Error loading job data: %v", err)
-//		return 0, 0, []byte{}
-//	}
-//
-//	file, err := ioutil.TempFile(os.TempDir(), "vtportal." + convertInt64ToString(j.Id) + ".csv")
-//	defer os.Remove(file.Name())
-//	csvWriter := csv.NewWriter(file)
-//	csvWriter.Write([]string{"MD5", "SHA256", "Permalink", "Positives", "Total", "ScanDate", "Scans"})
-//
-//	scanner := bufio.NewScanner(bytes.NewBuffer(data))
-//	var temp VtHash
-//	for scanner.Scan() {
-//		if isSha256 == true {
-//			err = dbMap.SelectOne(&temp, "SELECT * FROM hash_vt WHERE sha256 = $1", strings.ToLower(scanner.Text()))
-//		} else {
-//			err = dbMap.SelectOne(&temp, "SELECT * FROM hash_vt WHERE md5 = $1", strings.ToLower(scanner.Text()))
-//		}
-//
-//		if err != nil {
-//			continue
-//		}
-//
-//		if temp.Positives > 0 {
-//			positives += 1
-//		}
-//
-//		total += 1
-//
-//		csvWriter.Write([]string{
-//			temp.Md5,
-//			temp.Sha256,
-//			temp.Permalink,
-//			strconv.Itoa(int(temp.Positives)),
-//			strconv.Itoa(int(temp.Total)),
-//			convertUnixTimeToString(temp.ScanDate),
-//			temp.Scans})
-//	}
-//
-//	csvWriter.Flush()
-//	bytes, err := readFile(file.Name())
-//	if err != nil {
-//		log.Errorf("Error reading temp CSV file: %v", err)
-//		return 0, 0, []byte{}
-//	}
-//
-//	return bytes
-//}
+// Creates a CSV results file for hash jobs
+func (j *Job) OutputVtHashCsv(outputDir string, isSha256 bool) {
+
+	w := Work{}
+	data := w.GetAllWork()
+
+	fileName := "lookuper-vt-md5.csv"
+	if isSha256 == true {
+		fileName = "lookuper-vt-sha256.csv"
+	}
+
+	file, err := os.Create(path.Join(outputDir, fileName));
+	defer file.Close()
+	if err != nil {
+		log.Fatalf("Error opening output file: %v (%s)", err, path.Join(outputDir, fileName))
+	}
+
+	csvWriter := csv.NewWriter(file)
+	csvWriter.Write([]string{"MD5", "SHA256", "Permalink", "Positives", "Total", "ScanDate", "Scans"})
+
+	var temp VtHash
+	for _, d := range data {
+		if isSha256 == true {
+			err = dbMap.SelectOne(&temp, "SELECT * FROM vt_hash WHERE sha256 = $1", strings.ToLower(d))
+		} else {
+			err = dbMap.SelectOne(&temp, "SELECT * FROM vt_hash WHERE md5 = $1", strings.ToLower(d))
+		}
+
+		if err != nil {
+			log.Printf("Error retrieving data for VT hash output: %v", err)
+			break
+		}
+
+		csvWriter.Write([]string{
+			temp.Md5,
+			temp.Sha256,
+			temp.Permalink,
+			strconv.Itoa(int(temp.Positives)),
+			strconv.Itoa(int(temp.Total)),
+			util.ConvertInt64ToRfc3339String(temp.ScanDate),
+			temp.Scans})
+	}
+
+	csvWriter.Flush()
+}
+
+// Creates a CSV results file for VT URL
+func (j *Job) OutputVtUrls(outputDir string) {
+
+	w := Work{}
+	data := w.GetAllWork()
+
+	file, err := os.Create(path.Join(outputDir, "lookuper-vt-url.csv"));
+	defer file.Close()
+	if err != nil {
+		log.Fatalf("Error opening output file: %v (%s)", err, path.Join(outputDir, "lookuper-vt-url.csv"))
+	}
+
+	csvWriter := csv.NewWriter(file)
+	csvWriter.Write([]string{"URL", "Permalink", "Positives", "Total", "ScanDate", "Scans"})
+
+	var temp VtUrl
+	var md5 string
+	for _, d := range data {
+		md5 = util.Md5HashString(d)
+		err = dbMap.SelectOne(&temp, "SELECT * FROM url WHERE url_md5 = $1", md5)
+
+		if err != nil {
+			log.Printf("Error retrieving data for VT URL output: %v", err)
+			break
+		}
+
+		csvWriter.Write([]string{
+			temp.Url,
+			temp.Permalink,
+			strconv.Itoa(int(temp.Positives)),
+			strconv.Itoa(int(temp.Total)),
+			util.ConvertInt64ToRfc3339String(temp.ScanDate),
+			temp.Scans})
+	}
+
+	csvWriter.Flush()
+}
+
+// Creates a CSV results file for VT IP
+func (j *Job) OutputVtIps(outputDir string) {
+
+	w := Work{}
+	data := w.GetAllWork()
+
+	file, err := os.Create(path.Join(outputDir, "lookuper-vt-url.csv"));
+	defer file.Close()
+	if err != nil {
+		log.Fatalf("Error opening output file: %v (%s)", err, path.Join(outputDir, "lookuper-vt-url.csv"))
+	}
+
+	csvWriter := csv.NewWriter(file)
+	csvWriter.Write([]string{"URL", "Permalink", "Positives", "Total", "ScanDate", "Scans"})
+
+	var temp VtUrl
+	var md5 string
+	for _, d := range data {
+		md5 = util.Md5HashString(d)
+		err = dbMap.SelectOne(&temp, "SELECT * FROM url WHERE url_md5 = $1", md5)
+
+		if err != nil {
+			log.Printf("Error retrieving data for VT URL output: %v", err)
+			break
+		}
+
+		csvWriter.Write([]string{
+			temp.Url,
+			temp.Permalink,
+			strconv.Itoa(int(temp.Positives)),
+			strconv.Itoa(int(temp.Total)),
+			util.ConvertInt64ToRfc3339String(temp.ScanDate),
+			temp.Scans})
+	}
+
+	csvWriter.Flush()
+}
 
 //// Creates a CSV results file for hash jobs, also returns the total number
 //func (j *Job) GenerateJobCsvForHashesTe(dataFolder string) (total int, csvData []byte) {

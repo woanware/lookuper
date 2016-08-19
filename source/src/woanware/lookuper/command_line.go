@@ -22,10 +22,10 @@ func setupCli(app *cli.App) {
 		Usage: "Input file containing data to be looked up",
 	}
 
-	outputFileFlag := cli.StringFlag{
+	outputDirFlag := cli.StringFlag{
 		Name: "output, o",
 		Value: "",
-		Usage: "Output file for the results",
+		Usage: "Output directory for the results",
 	}
 
 	privateKeyFlag := cli.BoolFlag{
@@ -39,7 +39,7 @@ func setupCli(app *cli.App) {
 			Usage:   "Resumes an existing process",
 			Action:  func(c *cli.Context) error {
 
-				err := checkOutputFile(c.String("output"))
+				err := checkOutputDirectory(c.String("output"))
 				if err != nil {
 					return err
 				}
@@ -48,7 +48,7 @@ func setupCli(app *cli.App) {
 				return nil
 			},
 			Flags: []cli.Flag{
-				outputFileFlag,
+				outputDirFlag,
 			},
 		},
 		{
@@ -69,7 +69,7 @@ func setupCli(app *cli.App) {
 					return nil
 				}
 
-				err = checkOutputFile(c.String("output"))
+				err = checkOutputDirectory(c.String("output"))
 				if err != nil {
 					return err
 				}
@@ -88,7 +88,7 @@ func setupCli(app *cli.App) {
 			},
 			Flags: []cli.Flag{
 				inputFileFlag,
-				outputFileFlag,
+				outputDirFlag,
 				apiFlag,
 				privateKeyFlag,
 			},
@@ -103,7 +103,7 @@ func setupCli(app *cli.App) {
 					return err
 				}
 
-				err = checkOutputFile(c.String("output"))
+				err = checkOutputDirectory(c.String("output"))
 				if err != nil {
 					return err
 				}
@@ -113,7 +113,7 @@ func setupCli(app *cli.App) {
 			},
 			Flags: []cli.Flag{
 				inputFileFlag,
-				outputFileFlag,
+				outputDirFlag,
 			},
 		},
 		{
@@ -126,7 +126,7 @@ func setupCli(app *cli.App) {
 					return err
 				}
 
-				err = checkOutputFile(c.String("output"))
+				err = checkOutputDirectory(c.String("output"))
 				if err != nil {
 					return err
 				}
@@ -145,7 +145,7 @@ func setupCli(app *cli.App) {
 			},
 			Flags: []cli.Flag{
 				inputFileFlag,
-				outputFileFlag,
+				outputDirFlag,
 				apiFlag,
 				privateKeyFlag,
 			},
@@ -160,7 +160,7 @@ func setupCli(app *cli.App) {
 					return err
 				}
 
-				err = checkOutputFile(c.String("output"))
+				err = checkOutputDirectory(c.String("output"))
 				if err != nil {
 					return err
 				}
@@ -179,7 +179,7 @@ func setupCli(app *cli.App) {
 			},
 			Flags: []cli.Flag{
 				inputFileFlag,
-				outputFileFlag,
+				outputDirFlag,
 				apiFlag,
 				privateKeyFlag,
 			},
@@ -194,7 +194,7 @@ func setupCli(app *cli.App) {
 					return err
 				}
 
-				err = checkOutputFile(c.String("output"))
+				err = checkOutputDirectory(c.String("output"))
 				if err != nil {
 					return err
 				}
@@ -213,7 +213,7 @@ func setupCli(app *cli.App) {
 			},
 			Flags: []cli.Flag{
 				inputFileFlag,
-				outputFileFlag,
+				outputDirFlag,
 				apiFlag,
 				privateKeyFlag,
 			},
@@ -228,7 +228,7 @@ func setupCli(app *cli.App) {
 					return err
 				}
 
-				err = checkOutputFile(c.String("output"))
+				err = checkOutputDirectory(c.String("output"))
 				if err != nil {
 					return err
 				}
@@ -247,7 +247,7 @@ func setupCli(app *cli.App) {
 			},
 			Flags: []cli.Flag{
 				inputFileFlag,
-				outputFileFlag,
+				outputDirFlag,
 				apiFlag,
 				privateKeyFlag,
 			},
@@ -262,7 +262,7 @@ func setupCli(app *cli.App) {
 					return err
 				}
 
-				err = checkOutputFile(c.String("output"))
+				err = checkOutputDirectory(c.String("output"))
 				if err != nil {
 					return err
 				}
@@ -281,7 +281,7 @@ func setupCli(app *cli.App) {
 			},
 			Flags: []cli.Flag{
 				inputFileFlag,
-				outputFileFlag,
+				outputDirFlag,
 				apiFlag,
 				privateKeyFlag,
 			},
@@ -296,7 +296,7 @@ func setupCli(app *cli.App) {
 					return err
 				}
 
-				err = checkOutputFile(c.String("output"))
+				err = checkOutputDirectory(c.String("output"))
 				if err != nil {
 					return err
 				}
@@ -306,7 +306,7 @@ func setupCli(app *cli.App) {
 			},
 			Flags: []cli.Flag{
 				inputFileFlag,
-				outputFileFlag,
+				outputDirFlag,
 			},
 		},
 		{
@@ -319,7 +319,7 @@ func setupCli(app *cli.App) {
 					return err
 				}
 
-				err = checkOutputFile(c.String("output"))
+				err = checkOutputDirectory(c.String("output"))
 				if err != nil {
 					return err
 				}
@@ -340,7 +340,7 @@ func setupCli(app *cli.App) {
 			},
 			Flags: []cli.Flag{
 				inputFileFlag,
-				outputFileFlag,
+				outputDirFlag,
 				apiFlag,
 			},
 		},

@@ -10,11 +10,3 @@ type Config struct {
 	IgnoreKeywords			string  	`yaml:"ignored_keywords"`
 	IgnoreKeywordsArray		[]string	`yaml:"-"`
 }
-
-// Encapsulates the data from the "work" table
-type Work struct {
-	Md5        		string	`db:"md5"`
-	Data        	string	`db:"data"`
-	ResponseCode	int8	`db:"response_code"`
-}
-

@@ -2,31 +2,27 @@ package main
 
 import (
 	"github.com/williballenthin/govt"
-	util "github.com/woanware/goutil"
 	"strings"
 	"log"
 	"sort"
 	"fmt"
 	"time"
-	"encoding/csv"
-	"strconv"
 )
 
 // ##### Structs #######################################################################################################
 
-// Encapsulates the data from the "hash_vt" table
+// Encapsulates the data from the "vt_hash" table
 type VtHash struct {
-	Id         int64        `db:"id"`
-	Md5        string        `db:"md5"`
-	Sha256     string        `db:"sha256"`
-	Positives  int16        `db:"positives"`
-	Total      int16        `db:"total"`
-	Permalink  string        `db:"permalink"`
-	Scans      string        `db:"scans"`
-	ScanDate   int64        `db:"scan_date"`
-	UpdateDate int64        `db:"update_date"`
-	govtc      govt.Client    `db:"-"`
-	csvWriter  *csv.Writer    `db:"-"`
+	Id      	int64        	`db:"id"`
+	Md5        	string        	`db:"md5"`
+	Sha256     	string        	`db:"sha256"`
+	Positives  	int16        	`db:"positives"`
+	Total      	int16        	`db:"total"`
+	Permalink  	string        	`db:"permalink"`
+	Scans      	string        	`db:"scans"`
+	ScanDate   	int64        	`db:"scan_date"`
+	UpdateDate 	int64        	`db:"update_date"`
+	govtc      	govt.Client		`db:"-"`
 }
 
 // ##### Methods #######################################################################################################
@@ -46,7 +42,7 @@ func(h *VtHash) Process(data []string) int8 {
 
 	for _, fr := range *frr {
 		if fr.ResponseCode == 1 {
-			h.processResponse(&fr)
+			h.setRecord(fr)
 		}
 	}
 
@@ -71,40 +67,6 @@ func(h *VtHash) Process(data []string) int8 {
 //
 //	return WORK_RESPONSE_OK
 //}
-
-// Processes the VT response for a VT file report
-func (h *VtHash) processResponse(fr *govt.FileReport) int8 {
-	// If the number of positives is > than the threshold specified in the config file,
-	// then we determine if 50% or less of the scan results don't contain the keywords
-	// like "generic,toolbar" etc
-	if config.ThresholdPercentage > 0 {
-		if float32(fr.Positives) > config.ThresholdPercentage {
-			log.Printf("Positives identified > threshold: %d/%f (MD5: %s)", int(fr.Positives), config.ThresholdPercentage, fr.Md5)
-			numContainsKeyword := 0
-
-			for _, s := range fr.Scans {
-				if s.Detected == false {
-					continue
-				}
-
-				for _,k := range config.IgnoreKeywordsArray {
-					if strings.Contains(strings.ToLower(s.Result), k) == true {
-						numContainsKeyword += 1
-					}
-				}
-			}
-
-			ret := (100.0 / float32(fr.Positives) * float32(numContainsKeyword))
-			log.Printf("Keyword detection percentage: %f", ret)
-			if ret <= config.ThresholdPercentage {
-				//w.job.SetIdentifiedHighDetections()
-				//w.HighDetectionsFunc(w.JobId, fmt.Sprintf("MD5: %s\nScans: %s", fr.Md5, w.generateFileScansString(fr.Scans)))
-			}
-		}
-	}
-
-	return h.setRecord(*fr)
-}
 
 // Inserts a new hash record, if that fails due to it already existing, then retrieve details and update
 func (h *VtHash) setRecord(fr govt.FileReport) int8 {
@@ -132,36 +94,22 @@ func (h *VtHash) setRecord(fr govt.FileReport) int8 {
 		}
 	}
 
-	h.WriteCsv(*hash)
-
 	return WORK_RESPONSE_OK
 }
 
-func  (h *VtHash) DoesDataExist(data string, staleTimestamp time.Time) (error, bool) {
+//
+func  (h *VtHash) DoesDataExist(isMd5 bool, data string, staleTimestamp time.Time) (error, bool) {
 
-	var hash VtHash
-	err := dbMap.SelectOne(&hash, "SELECT * FROM vt_hash WHERE md5 = $1", strings.ToLower(data))
-	err, exists := validateDbData(hash.UpdateDate, staleTimestamp.Unix(), err)
-	if err == nil && exists == true {
-		h.WriteCsv(hash)
+	sql := "SELECT * FROM vt_hash WHERE md5 = $1"
+	if isMd5 == false {
+		sql = "SELECT * FROM vt_hash WHERE sha256 = $1"
 	}
 
+	var hash VtHash
+	err := dbMap.SelectOne(&hash, sql, strings.ToLower(data))
+	err, exists := validateDbData(hash.UpdateDate, staleTimestamp.Unix(), err)
+
 	return err, exists
-}
-
-//
-func (h *VtHash) WriteCsv(hash VtHash) {
-
-	h.csvWriter.Write([]string{
-		hash.Md5,
-		hash.Sha256,
-		hash.Permalink,
-		strconv.Itoa(int(hash.Positives)),
-		strconv.Itoa(int(hash.Total)),
-		util.ConvertInt64ToRfc3339String(hash.ScanDate),
-		hash.Scans})
-
-	h.csvWriter.Flush()
 }
 
 // Generic method to copy the VT data to our hash object

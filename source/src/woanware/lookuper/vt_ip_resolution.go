@@ -54,6 +54,16 @@ func (i *VtIpResolution) Process(data string) int8 {
 	return WORK_RESPONSE_OK
 }
 
+//
+func (i *VtIpResolution) DoesDataExist(data uint32, staleTimestamp time.Time) (error, bool) {
+
+	var ipRes VtIpResolution
+	err := dbMap.SelectOne(&ipRes, "SELECT * FROM vt_ip_resolution WHERE ip = $1", data)
+	err, exists := validateDbData(ipRes.UpdateDate, staleTimestamp.Unix(), err)
+
+	return err, exists
+}
+
 // Processes the VT response for a VT IP report
 func (i *VtIpResolution) processResponse(data string, ir *govt.IpReport) int8 {
 	for _, r := range ir.Resolutions {
