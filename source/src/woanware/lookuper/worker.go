@@ -12,6 +12,8 @@ import (
 	"io/ioutil"
 	"time"
 	"fmt"
+	"encoding/csv"
+	"os"
 )
 
 // ##### Structs #######################################################################################################
@@ -20,10 +22,11 @@ type Worker struct {
 	db 					*sql.DB
 	dataType 			int
 	govtc 				govt.Client
+	csvWriter			*csv.Writer
 	privateApiKeys		bool
-	numberTotal    		uint32
-	numberComplete 		uint32
-	numberCacheHits		uint32
+	numberTotal    		int
+	numberComplete 		int
+	numberCacheHits		int
 }
 
 // ##### Methods #######################################################################################################
@@ -44,12 +47,10 @@ func NewWorker() *Worker {
 //
 func (w *Worker) Run(
 	inputFile string,
+	outputFile string,
 	dataType int,
 	apiKeys []string,
 	privateApiKeys bool) {
-
-	w.dataType = dataType
-	w.privateApiKeys = privateApiKeys
 
 	existing, err := w.isExistingWork()
 	if err != nil {
@@ -57,14 +58,45 @@ func (w *Worker) Run(
 		return
 	}
 
+	j := new(Job)
+
 	if len(inputFile) > 0 {
 		if existing == true {
 			fmt.Println("There is existing data in the work queue. Use the 'resume' command to continue or the 'clear' command to clear the queue")
 			return
 		} else {
+			j.Type = dataType
+			j.ApiKeys = strings.Join(apiKeys, "#")
+			j.AreApiKeysPrivate = privateApiKeys
+			j.Save()
+
 			w.loadData(inputFile)
+
+			file, err := os.Create(outputFile);
+			if err != nil {
+				log.Fatalf("Error opening output file: %v (%s)", err, outputFile)
+			}
+			w.csvWriter = csv.NewWriter(file)
 		}
+	} else {
+		if existing == false {
+			fmt.Println("No existing work to continue")
+			return
+		}
+
+		dataType, apiKeys, privateApiKeys = w.loadJob()
+
+		file, err := os.OpenFile(outputFile, os.O_RDWR|os.O_APPEND, 0660);
+		if err != nil {
+			log.Fatalf("Error opening output file: %v (%s)", err, outputFile)
+		}
+		w.csvWriter = csv.NewWriter(file)
 	}
+
+	w.dataType = dataType
+	w.privateApiKeys = privateApiKeys
+
+	log.Printf("Data type: %s", dataTypes[w.dataType])
 
 	for {
 		w.govtc = govt.Client{}
@@ -87,9 +119,9 @@ func (w *Worker) Run(
 				return
 			}
 
-			//w.generateResultZipFiles()
-
-			log.Println("Job complete")
+			resetTables(false)
+			log.Println("Complete")
+			log.Printf("Cache hits: %d", w.numberCacheHits)
 			return
 		}
 
@@ -116,6 +148,23 @@ func (w *Worker) Run(
 	}
 }
 
+//
+func (w *Worker) loadJob() (int, []string, bool) {
+	j := Job{}
+	j.Load()
+
+	var total int
+	total, err := w.getWorkCount()
+	if err != nil {
+		log.Fatalf("Error retrieving work count: %v ", err)
+	}
+	w.numberTotal = total
+	log.Printf("Loaded No. items: %d", w.numberTotal)
+
+	return j.Type, strings.Split(j.ApiKeys, "#"), j.AreApiKeysPrivate
+}
+
+//
 func (w *Worker) loadData(inputFile string) {
 
 	log.Println("Loading data")
@@ -174,7 +223,7 @@ func (w *Worker) loadData(inputFile string) {
 	}
 	transaction.Commit()
 
-	w.numberTotal = (uint32(len(uniquedList)))
+	w.numberTotal = (len(uniquedList))
 
 	log.Printf("Loaded No. items: %d", len(uniquedList))
 }
@@ -192,6 +241,17 @@ func (w *Worker) isExistingWork() (bool, error) {
 	}
 
 	return true, nil
+}
+
+//
+func (w *Worker) getWorkCount() (int, error) {
+	var count int
+	err := dbMap.SelectOne(&count, "SELECT COUNT(1) as val FROM work")
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
 }
 
 // Performs the actually processing of the user supplied data. The method opens the input file and reads the data line
@@ -245,8 +305,9 @@ func (w *Worker) loadBatch(batchSize int) (BatchData) {
 
 	staleTimestamp := time.Now().UTC().Add(-time.Duration(24*config.MaxHashAge) * time.Hour)
 
+	workData := make(map[string]int8)
+
 	rows, err := w.db.Query("SELECT data FROM work WHERE response_code = $1", util.ConvertInt8ToString(WORK_RESPONSE_NOT_PERFORMED))
-	defer rows.Close()
 	for rows.Next() {
 		err = rows.Scan(&data)
 		if len(data) == 0 {
@@ -256,7 +317,7 @@ func (w *Worker) loadBatch(batchSize int) (BatchData) {
 		err, ret = w.doesDataExistInDb(staleTimestamp, data)
 		if err != nil {
 			log.Printf("Error determining if data exists in database: %v (%s)", err, data)
-			w.setWorkRecord(data, WORK_RESPONSE_ERROR)
+			workData[data] = WORK_RESPONSE_ERROR
 			w.numberComplete += 1
 			continue
 		}
@@ -264,15 +325,21 @@ func (w *Worker) loadBatch(batchSize int) (BatchData) {
 		if ret == true {
 			w.numberCacheHits += 1
 			w.numberComplete += 1
-			w.setWorkRecord(data, WORK_RESPONSE_OK)
+			workData[data] = WORK_RESPONSE_OK
 			continue
 		}
 
 		batchData.AddData(data)
 
 		if len(batchData.Items) >= batchSize {
-			return batchData
+			break
 		}
+	}
+	rows.Close()
+
+	// We update after, due to locking
+	for k, v := range workData {
+		w.setWorkRecord(k, v)
 	}
 
 	return batchData
@@ -282,9 +349,17 @@ func (w *Worker) loadBatch(batchSize int) (BatchData) {
 func (w *Worker) doesDataExistInDb(staleTimestamp time.Time, data string) (error, bool) {
 	switch w.dataType {
 	case dataTypeMd5Vt:
-		var temp VtHash
-		err := dbMap.SelectOne(&temp, "SELECT * FROM vt_hash WHERE md5 = $1", data)
-		return w.validateDbData(temp.UpdateDate, staleTimestamp.Unix(), err)
+		vtHash := VtHash{govtc: w.govtc, csvWriter: w.csvWriter}
+		//vtHash := new(VtHash)
+		//vtHash.CsvWriter = w.csvWriter
+		//{csvWriter: }
+		//err := dbMap.SelectOne(&temp, "SELECT * FROM vt_hash WHERE md5 = $1", strings.ToLower(data))
+
+		//temp.csvWriter = w.csvWriter
+		//temp.WriteCsv(&temp)
+		//return w.validateDbData(temp.UpdateDate, staleTimestamp.Unix(), err)
+
+		return vtHash.DoesDataExist(data, staleTimestamp)
 	case dataTypeSha256Vt:
 		var temp VtHash
 		err := dbMap.SelectOne(&temp, "SELECT * FROM vt_hash WHERE sha256 = $1", data)
@@ -356,6 +431,7 @@ func (w *Worker) doesWorkExist(md5 string) (error, bool) {
 func (w *Worker) validateDbData(updateDate int64, staleTimestamp int64, err error) (error, bool) {
 
 	if err != nil {
+		log.Printf("%v", err)
 		if strings.Contains(strings.ToLower(err.Error()), "no rows in result set") == true {
 			return nil, false
 		} else {
@@ -380,7 +456,7 @@ func (w *Worker) processBatch(apiKey string, batch BatchData) int8 {
 		if len(batch.Items) == 1 {
 			switch w.dataType {
 			case dataTypeMd5Vt:
-				vtHash := VtHash{govtc: w.govtc}
+				vtHash := VtHash{govtc: w.govtc, csvWriter: w.csvWriter}
 				response_code = vtHash.Process([]string{batch.Items[0]})
 			case dataTypeSha256Vt:
 				vtHash := VtHash{govtc: w.govtc}
@@ -407,7 +483,7 @@ func (w *Worker) processBatch(apiKey string, batch BatchData) int8 {
 		} else {
 			switch w.dataType {
 			case dataTypeMd5Vt:
-				vtHash := VtHash{govtc: w.govtc}
+				vtHash := VtHash{govtc: w.govtc, csvWriter: w.csvWriter}
 				response_code = vtHash.Process(batch.Items)
 			case dataTypeSha256Vt:
 				vtHash := VtHash{govtc: w.govtc}
@@ -427,7 +503,7 @@ func (w *Worker) processBatch(apiKey string, batch BatchData) int8 {
 		}
 
 		attempts += 1
-		log.Println("Retrying batch: Attempts: %d Response Code: %d", attempts, response_code)
+		log.Printf("Retrying batch: Attempts: %d Response Code: %d", attempts, response_code)
 	}
 
 	if response_code == WORK_RESPONSE_ERROR || response_code == WORK_RESPONSE_KEY_FAILED {
@@ -444,7 +520,8 @@ func (w *Worker) processBatch(apiKey string, batch BatchData) int8 {
 		}
 	}
 
-	w.numberComplete += uint32(len(batch.Items))
+	w.numberComplete += len(batch.Items)
+
 	return WORK_RESPONSE_OK
 }
 

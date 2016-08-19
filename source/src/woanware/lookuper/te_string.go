@@ -35,7 +35,7 @@ func (s *TeString) Process(data string) int8 {
 
 	resp, err := httpClient.Do(req)
 	if resp == nil {
-		log.Printf("No TE response (%d): %v", err)
+		log.Printf("No TE response: %v", err)
 		return WORK_RESPONSE_ERROR
 	}
 
@@ -86,7 +86,7 @@ func (s *TeString) setRecord(data string, count int) int8 {
 			return WORK_RESPONSE_ERROR
 		}
 
-		err := dbMap.SelectOne(stringTe, "SELECT * FROM string_te WHERE string = $1", strings.ToLower(stringTe.String))
+		err := dbMap.SelectOne(stringTe, "SELECT * FROM te_string WHERE string = $1", strings.ToLower(stringTe.String))
 		if err != nil {
 			log.Printf("Error retrieving TE string record: %v", err)
 			return WORK_RESPONSE_ERROR

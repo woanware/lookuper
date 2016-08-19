@@ -79,7 +79,7 @@ func (i *VtIpResolution) setRecordIr(ipAddress string, ir govt.IpResolution) int
 	err := dbMap.Insert(data)
 	if err != nil {
 		if strings.Contains(strings.ToLower(err.Error()), "duplicate key value violates") {
-			err := dbMap.SelectOne(data, "SELECT * FROM ip_resolution WHERE ip = $1 and host_name_md5 = $2", data.Ip, data.HostNameMd5)
+			err := dbMap.SelectOne(data, "SELECT * FROM vt_ip_resolution WHERE ip = $1 and host_name_md5 = $2", data.Ip, data.HostNameMd5)
 			if err != nil {
 				log.Printf("Error retrieving IP resolution record: %v", err)
 				return WORK_RESPONSE_ERROR
@@ -108,7 +108,7 @@ func (i *VtIpResolution) setRecordIdu(ipAddress string, du govt.DetectedUrl) int
 	err := dbMap.Insert(data)
 	if err != nil {
 		if strings.Contains(strings.ToLower(err.Error()), "duplicate key value violates") {
-			err := dbMap.SelectOne(data, "SELECT * FROM ip_detected_url WHERE ip = $1 and url_md5 = $2", data.Ip, data.UrlMd5)
+			err := dbMap.SelectOne(data, "SELECT * FROM vt_ip_detected_url WHERE ip = $1 and url_md5 = $2", data.Ip, data.UrlMd5)
 			if err != nil {
 				log.Printf("Error retrieving IP detected URL record: %v", err)
 				return WORK_RESPONSE_ERROR

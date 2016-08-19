@@ -22,28 +22,40 @@ func setupCli(app *cli.App) {
 		Usage: "Input file containing data to be looked up",
 	}
 
+	outputFileFlag := cli.StringFlag{
+		Name: "output, o",
+		Value: "",
+		Usage: "Output file for the results",
+	}
+
 	privateKeyFlag := cli.BoolFlag{
 		Name: "privatekey, p",
 		Usage: "Are the API key(s) private?",
 	}
 
-	//app.Action = func(c *cli.Context) error {
-	//	err := checkInputFile(c.String("input"))
-	//	if err != nil {
-	//		return err
-	//	}
-	//
-	//	inputFile = c.String("input")
-	//
-	//	return nil
-	//}
-
 	app.Commands = []cli.Command{
+		{
+			Name:    "resume",
+			Usage:   "Resumes an existing process",
+			Action:  func(c *cli.Context) error {
+
+				err := checkOutputFile(c.String("output"))
+				if err != nil {
+					return err
+				}
+
+				run(0, "", c.String("output"), []string{})
+				return nil
+			},
+			Flags: []cli.Flag{
+				outputFileFlag,
+			},
+		},
 		{
 			Name:    "clear",
 			Usage:   "Clears the work queue",
 			Action:  func(c *cli.Context) error {
-				clearWorkTable()
+				resetTables(true)
 				return nil
 			},
 		},
@@ -57,20 +69,26 @@ func setupCli(app *cli.App) {
 					return nil
 				}
 
+				err = checkOutputFile(c.String("output"))
+				if err != nil {
+					return err
+				}
+
 				if len(config.VtApiKeys) > 0 {
-					run(dataTypeMd5Vt, c.String("input"), config.VtApiKeys)
+					run(dataTypeMd5Vt, c.String("input"), c.String("output"), config.VtApiKeys)
 				} else {
 					success, apiKeys := getApiKeys(c.String("api"))
 					if success == false {
 						return errors.New("No API keys supplied")
 					}
-					run(dataTypeMd5Vt, c.String("input"), apiKeys)
+					run(dataTypeMd5Vt, c.String("input"), c.String("output"), apiKeys)
 				}
 
 				return nil
 			},
 			Flags: []cli.Flag{
 				inputFileFlag,
+				outputFileFlag,
 				apiFlag,
 				privateKeyFlag,
 			},
@@ -85,11 +103,17 @@ func setupCli(app *cli.App) {
 					return err
 				}
 
-				run(dataTypeMd5Te, c.String("api"), []string{})
+				err = checkOutputFile(c.String("output"))
+				if err != nil {
+					return err
+				}
+
+				run(dataTypeMd5Te, c.String("input"), c.String("output"), []string{})
 				return nil
 			},
 			Flags: []cli.Flag{
 				inputFileFlag,
+				outputFileFlag,
 			},
 		},
 		{
@@ -102,20 +126,26 @@ func setupCli(app *cli.App) {
 					return err
 				}
 
+				err = checkOutputFile(c.String("output"))
+				if err != nil {
+					return err
+				}
+
 				if len(config.VtApiKeys) > 0 {
-					run(dataTypeMd5Vt, c.String("api"), config.VtApiKeys)
+					run(dataTypeMd5Vt, c.String("input"), c.String("output"), config.VtApiKeys)
 				} else {
 					success, apiKeys := getApiKeys(c.String("api"))
 					if success == false {
 						return errors.New("No API keys supplied")
 					}
-					run(dataTypeMd5All, c.String("api"), apiKeys)
+					run(dataTypeMd5All, c.String("input"), c.String("output"), apiKeys)
 				}
 
 				return nil
 			},
 			Flags: []cli.Flag{
 				inputFileFlag,
+				outputFileFlag,
 				apiFlag,
 				privateKeyFlag,
 			},
@@ -130,20 +160,26 @@ func setupCli(app *cli.App) {
 					return err
 				}
 
+				err = checkOutputFile(c.String("output"))
+				if err != nil {
+					return err
+				}
+
 				if len(config.VtApiKeys) > 0 {
-					run(dataTypeMd5Vt, c.String("api"), config.VtApiKeys)
+					run(dataTypeMd5Vt, c.String("input"), c.String("output"), config.VtApiKeys)
 				} else {
 					success, apiKeys := getApiKeys(c.String("api"))
 					if success == false {
 						return errors.New("No API keys supplied")
 					}
-					run(dataTypeSha256Vt, c.String("api"), apiKeys)
+					run(dataTypeSha256Vt, c.String("input"), c.String("output"), apiKeys)
 				}
 
 				return nil
 			},
 			Flags: []cli.Flag{
 				inputFileFlag,
+				outputFileFlag,
 				apiFlag,
 				privateKeyFlag,
 			},
@@ -158,20 +194,26 @@ func setupCli(app *cli.App) {
 					return err
 				}
 
+				err = checkOutputFile(c.String("output"))
+				if err != nil {
+					return err
+				}
+
 				if len(config.VtApiKeys) > 0 {
-					run(dataTypeMd5Vt, c.String("api"), config.VtApiKeys)
+					run(dataTypeMd5Vt, c.String("input"), c.String("output"), config.VtApiKeys)
 				} else {
 					success, apiKeys := getApiKeys(c.String("api"))
 					if success == false {
 						return errors.New("No API keys supplied")
 					}
-					run(dataTypeIpVt, c.String("api"), apiKeys)
+					run(dataTypeIpVt, c.String("input"), c.String("output"), apiKeys)
 				}
 
 				return nil
 			},
 			Flags: []cli.Flag{
 				inputFileFlag,
+				outputFileFlag,
 				apiFlag,
 				privateKeyFlag,
 			},
@@ -186,20 +228,26 @@ func setupCli(app *cli.App) {
 					return err
 				}
 
+				err = checkOutputFile(c.String("output"))
+				if err != nil {
+					return err
+				}
+
 				if len(config.VtApiKeys) > 0 {
-					run(dataTypeMd5Vt, c.String("api"), config.VtApiKeys)
+					run(dataTypeMd5Vt, c.String("input"), c.String("output"), config.VtApiKeys)
 				} else {
 					success, apiKeys := getApiKeys(c.String("api"))
 					if success == false {
 						return errors.New("No API keys supplied")
 					}
-					run(dataTypeDomainVt, c.String("api"), apiKeys)
+					run(dataTypeDomainVt, c.String("input"), c.String("output"), apiKeys)
 				}
 
 				return nil
 			},
 			Flags: []cli.Flag{
 				inputFileFlag,
+				outputFileFlag,
 				apiFlag,
 				privateKeyFlag,
 			},
@@ -214,20 +262,26 @@ func setupCli(app *cli.App) {
 					return err
 				}
 
+				err = checkOutputFile(c.String("output"))
+				if err != nil {
+					return err
+				}
+
 				if len(config.VtApiKeys) > 0 {
-					run(dataTypeMd5Vt, c.String("api"), config.VtApiKeys)
+					run(dataTypeMd5Vt, c.String("input"), c.String("output"), config.VtApiKeys)
 				} else {
 					success, apiKeys := getApiKeys(c.String("api"))
 					if success == false {
 						return errors.New("No API keys supplied")
 					}
-					run(dataTypeUrlVt, c.String("api"), apiKeys)
+					run(dataTypeUrlVt, c.String("input"), c.String("output"), apiKeys)
 				}
 
 				return nil
 			},
 			Flags: []cli.Flag{
 				inputFileFlag,
+				outputFileFlag,
 				apiFlag,
 				privateKeyFlag,
 			},
@@ -242,11 +296,17 @@ func setupCli(app *cli.App) {
 					return err
 				}
 
-				run(dataTypeStringTe, c.String("api"), []string{})
+				err = checkOutputFile(c.String("output"))
+				if err != nil {
+					return err
+				}
+
+				run(dataTypeStringTe, c.String("input"), c.String("output"), []string{})
 				return nil
 			},
 			Flags: []cli.Flag{
 				inputFileFlag,
+				outputFileFlag,
 			},
 		},
 		{
@@ -259,9 +319,14 @@ func setupCli(app *cli.App) {
 					return err
 				}
 
+				err = checkOutputFile(c.String("output"))
+				if err != nil {
+					return err
+				}
+
 				if len(config.SafeBrowsingApiKey) > 0 {
 					initialiseSafeBrowsing(config.SafeBrowsingApiKey)
-					run(dataTypeGsb, c.String("api"), []string{})
+					run(dataTypeGsb, c.String("input"), c.String("output"), []string{})
 				} else {
 					success, apiKeys := getApiKeys(c.String("api"))
 					if success == false {
@@ -269,12 +334,13 @@ func setupCli(app *cli.App) {
 					}
 
 					initialiseSafeBrowsing(apiKeys[0])
-					run(dataTypeGsb, c.String("api"), apiKeys)
+					run(dataTypeGsb, c.String("input"), c.String("output"), apiKeys)
 				}
 				return nil
 			},
 			Flags: []cli.Flag{
 				inputFileFlag,
+				outputFileFlag,
 				apiFlag,
 			},
 		},

@@ -78,7 +78,7 @@ func (u *VtUrl) setRecord(ur govt.UrlReport) int8 {
 	err := dbMap.Insert(data)
 	if err != nil {
 		if strings.Contains(strings.ToLower(err.Error()), "duplicate key value violates") {
-			err := dbMap.SelectOne(data, "SELECT * FROM url WHERE url_md5 = $1", data.UrlMd5)
+			err := dbMap.SelectOne(data, "SELECT * FROM vt_url WHERE url_md5 = $1", data.UrlMd5)
 			if err != nil {
 				log.Printf("Error retrieving URL record: %v", err)
 				return WORK_RESPONSE_ERROR

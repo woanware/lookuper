@@ -2,27 +2,31 @@ package main
 
 import (
 	"github.com/williballenthin/govt"
+	util "github.com/woanware/goutil"
 	"strings"
 	"log"
 	"sort"
 	"fmt"
 	"time"
+	"encoding/csv"
+	"strconv"
 )
 
 // ##### Structs #######################################################################################################
 
 // Encapsulates the data from the "hash_vt" table
 type VtHash struct {
-	Id         	int64		`db:"id"`
-	Md5        	string		`db:"md5"`
-	Sha256     	string		`db:"sha256"`
-	Positives  	int16		`db:"positives"`
-	Total      	int16		`db:"total"`
-	Permalink  	string		`db:"permalink"`
-	Scans      	string		`db:"scans"`
-	ScanDate   	int64 		`db:"scan_date"`
-	UpdateDate 	int64 		`db:"update_date"`
-	govtc		govt.Client	`db:"-"`
+	Id         int64        `db:"id"`
+	Md5        string        `db:"md5"`
+	Sha256     string        `db:"sha256"`
+	Positives  int16        `db:"positives"`
+	Total      int16        `db:"total"`
+	Permalink  string        `db:"permalink"`
+	Scans      string        `db:"scans"`
+	ScanDate   int64        `db:"scan_date"`
+	UpdateDate int64        `db:"update_date"`
+	govtc      govt.Client    `db:"-"`
+	csvWriter  *csv.Writer    `db:"-"`
 }
 
 // ##### Methods #######################################################################################################
@@ -114,7 +118,7 @@ func (h *VtHash) setRecord(fr govt.FileReport) int8 {
 			return WORK_RESPONSE_ERROR
 		}
 
-		err := dbMap.SelectOne(hash, "SELECT * FROM hash_vt WHERE md5 = $1", strings.ToLower(hash.Md5))
+		err := dbMap.SelectOne(hash, "SELECT * FROM vt_hash WHERE md5 = $1", strings.ToLower(hash.Md5))
 		if err != nil {
 			log.Printf("Error retrieving VT hash record: %v", err)
 			return WORK_RESPONSE_ERROR
@@ -128,7 +132,36 @@ func (h *VtHash) setRecord(fr govt.FileReport) int8 {
 		}
 	}
 
+	h.WriteCsv(*hash)
+
 	return WORK_RESPONSE_OK
+}
+
+func  (h *VtHash) DoesDataExist(data string, staleTimestamp time.Time) (error, bool) {
+
+	var hash VtHash
+	err := dbMap.SelectOne(&hash, "SELECT * FROM vt_hash WHERE md5 = $1", strings.ToLower(data))
+	err, exists := validateDbData(hash.UpdateDate, staleTimestamp.Unix(), err)
+	if err == nil && exists == true {
+		h.WriteCsv(hash)
+	}
+
+	return err, exists
+}
+
+//
+func (h *VtHash) WriteCsv(hash VtHash) {
+
+	h.csvWriter.Write([]string{
+		hash.Md5,
+		hash.Sha256,
+		hash.Permalink,
+		strconv.Itoa(int(hash.Positives)),
+		strconv.Itoa(int(hash.Total)),
+		util.ConvertInt64ToRfc3339String(hash.ScanDate),
+		hash.Scans})
+
+	h.csvWriter.Flush()
 }
 
 // Generic method to copy the VT data to our hash object

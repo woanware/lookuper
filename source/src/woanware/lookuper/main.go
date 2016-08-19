@@ -58,45 +58,15 @@ func main() {
 	config = loadConfig()
 	dbMap = initialiseDb()
 	initialiseRegexes()
-
 	setupCli(app)
 
 	app.Run(os.Args)
 }
 
 // Main method for starting the work object
-func run(dataType int, inputFile string, apiKeys []string) {
+func run(dataType int, inputFile string, outputFile string, apiKeys []string) {
 	w := NewWorker()
-	w.Run(inputFile, dataType, apiKeys, false)
-}
-
-// Drops the "work" table and then recreates, which is easier and quicker than truncating etc
-func clearWorkTable() {
-	db, err := sql.Open("sqlite3", DB_FILE_NAME)
-	if err != nil {
-		log.Fatalf("Error opening database for schema creation: %v", err)
-	}
-	defer db.Close()
-
-	_, err = db.Exec("DROP TABLE work;")
-	if err != nil {
-		log.Printf("Error dropping work table: %v", err)
-		return
-	}
-
-	_, err = db.Exec(SQL_CREATE_TABLE_WORK)
-	if err != nil {
-		log.Printf("Error creating work table: %v", err)
-		return
-	}
-
-	_, err = db.Exec(SQL_CREATE_INDEX_WORK)
-	if err != nil {
-		log.Printf("Error creating work table: %v", err)
-		return
-	}
-
-	log.Printf("Work queue cleared")
+	w.Run(inputFile, outputFile, dataType, apiKeys, false)
 }
 
 // Creates the SQLite database
@@ -137,6 +107,7 @@ func initialiseDb() (*gorp.DbMap) {
 	}
 
 	dbMap := &gorp.DbMap{Db: db, Dialect: gorp.SqliteDialect{}}
+	dbMap.AddTableWithName(Job{}, "job").SetKeys(true, "id")
 	dbMap.AddTableWithName(Work{}, "work").SetKeys(false, "md5")
 	dbMap.AddTableWithName(VtHash{}, "vt_hash").SetKeys(true, "id")
 	dbMap.AddTableWithName(TeHash{}, "te_hash").SetKeys(true, "id")

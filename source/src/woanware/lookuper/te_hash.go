@@ -79,7 +79,7 @@ func (h *TeHash) processResponse(md5 string, body string) int8 {
 
 	regexSeverities := regexTeSeverity.FindAllStringSubmatch(string(body), -1)
 	if regexSeverities == nil {
-		log.Printf("No Severity regex matches in TE hash report (%d)")
+		log.Printf("No Severity regex matches in TE hash report")
 		return WORK_RESPONSE_ERROR
 	}
 

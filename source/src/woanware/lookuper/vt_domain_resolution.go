@@ -78,7 +78,7 @@ func (d *VtDomainResolution) setRecordDr(domain string, dr govt.DomainResolution
 	err := dbMap.Insert(data)
 	if err != nil {
 		if strings.Contains(strings.ToLower(err.Error()), "duplicate key value violates") {
-			err := dbMap.SelectOne(data, "SELECT * FROM domain_resolution WHERE domain_md5 = $1 and ip_address = $2", data.DomainMd5, data.IpAddress)
+			err := dbMap.SelectOne(data, "SELECT * FROM vt_domain_resolution WHERE domain_md5 = $1 and ip_address = $2", data.DomainMd5, data.IpAddress)
 			if err != nil {
 				log.Printf("Error retrieving domain resolution record: %v", err)
 				return WORK_RESPONSE_ERROR
@@ -107,7 +107,7 @@ func (d *VtDomainResolution) setRecordDdu(domain string, du govt.DetectedUrl) in
 	err := dbMap.Insert(data)
 	if err != nil {
 		if strings.Contains(strings.ToLower(err.Error()), "duplicate key value violates") {
-			err := dbMap.SelectOne(data, "SELECT * FROM domain_detected_url WHERE domain_md5 = $1 and url_md5 = $2",  data.DomainMd5, data.UrlMd5)
+			err := dbMap.SelectOne(data, "SELECT * FROM vt_domain_detected_url WHERE domain_md5 = $1 and url_md5 = $2",  data.DomainMd5, data.UrlMd5)
 			if err != nil {
 				log.Printf("Error retrieving domain detected URL record: %v", err)
 				return WORK_RESPONSE_ERROR
