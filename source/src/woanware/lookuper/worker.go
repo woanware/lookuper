@@ -354,10 +354,8 @@ func (w *Worker) doesDataExistInDb(staleTimestamp time.Time, data string) (error
 		teString := TeString{}
 		return teString.DoesDataExist(data, staleTimestamp)
 	case dataTypeGsb:
-		md5 := util.Md5HashString(data)
-		var temp GoogleSafeBrowsing
-		err := dbMap.SelectOne(&temp, "SELECT * FROM google_safe_browsing WHERE url_md5 = $1", md5)
-		return w.validateDbData(temp.UpdateDate, staleTimestamp.Unix(), err)
+		gsb := GoogleSafeBrowsing{}
+		return gsb.DoesDataExist(data, staleTimestamp)
 	}
 
 	return nil, false

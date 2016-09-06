@@ -74,7 +74,7 @@ func (h *VtHash) setRecord(fr govt.FileReport) int8 {
 	err := dbMap.Insert(hash)
 	if err != nil {
 		if strings.Contains(strings.ToLower(err.Error()), "duplicate key value violates") == false {
-			log.Error("Error inserting VT hash record: %v (%s)", err, hash.Md5)
+			log.Printf("Error inserting VT hash record: %v (%s)", err, hash.Md5)
 			return WORK_RESPONSE_ERROR
 		}
 

@@ -292,7 +292,7 @@ func setupCli(app *cli.App) {
 
 				if len(config.SafeBrowsingApiKey) > 0 {
 					initialiseSafeBrowsing(config.SafeBrowsingApiKey)
-					run(dataTypeGsb, c.String("input"), c.String("output"), []string{})
+					run(dataTypeGsb, c.String("input"), c.String("output"), []string{FAKE_API_KEY2})
 				} else {
 					success, apiKeys := getApiKeys(c.String("api"))
 					if success == false {
@@ -300,7 +300,7 @@ func setupCli(app *cli.App) {
 					}
 
 					initialiseSafeBrowsing(apiKeys[0])
-					run(dataTypeGsb, c.String("input"), c.String("output"), apiKeys)
+					run(dataTypeGsb, c.String("input"), c.String("output"), []string{FAKE_API_KEY2})
 				}
 				return nil
 			},

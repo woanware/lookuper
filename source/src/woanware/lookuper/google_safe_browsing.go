@@ -34,17 +34,23 @@ func (g *GoogleSafeBrowsing) Process(data string) int8 {
 	if len(threats[0]) > 0 {
 		response = fmt.Sprintf("Platform: %s#Type: %s#Entry Type: %s",
 			threats[0][0].PlatformType, threats[0][0].ThreatType, threats[0][0].ThreatEntryType)
-	}
 
-	g.setRecord(data, response)
+		g.setRecord(data, response)
+	}
 
 	return WORK_RESPONSE_OK
 }
 
-//// Processes the response for a Google SafeBrowsing URL report
-//func (g *GoogleSafeBrowsing) processUrlGReport(data string, response string) int8 {
-//	return g.setUrlGRecord(data, response)
-//}
+//
+func (g *GoogleSafeBrowsing) DoesDataExist(data string, staleTimestamp time.Time) (error, bool) {
+
+	md5 := util.Md5HashString(data)
+	var temp GoogleSafeBrowsing
+	err := dbMap.SelectOne(&temp, "SELECT * FROM google_safe_browsing WHERE url_md5 = $1", md5)
+	err, exists := validateDbData(temp.UpdateDate, staleTimestamp.Unix(), err)
+
+	return err, exists
+}
 
 // Inserts a new URL record, if that fails due to it already existing, then retrieve details and update
 func (g *GoogleSafeBrowsing) setRecord(url string, response string) int8 {

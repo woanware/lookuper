@@ -1,0 +1,338 @@
+{A3BD3259-3E4F-428a-84C8-F0463A9D3EB5}
+SessionImmersiveColorMutex
+LMIinitcredguard
+RasPbFile
+RasPbFile
+MSCTF.CtfMonitorInstMutexWinlogon1
+MSCTF.Asm.MutexWinlogon1
+DBWinMutex
+3a886eb8-fe40-4d0a-b78b-9e0bcb683fb7
+RasPbFile
+DBWinMutex
+DBWinMutex
+LOADPERF_MUTEX
+0000000000A742981060
+PvLogiciels.dotNetProtector.Runtime.156
+WmiApRpl_Perf_Library_Lock_PID_424
+.NET CLR Data_Perf_Library_Lock_PID_424
+.NET CLR Networking_Perf_Library_Lock_PID_424
+.NET CLR Networking 4.0.0.0_Perf_Library_Lock_PID_424
+.NET Data Provider for Oracle_Perf_Library_Lock_PID_424
+.NET Data Provider for SqlServer_Perf_Library_Lock_PID_424
+.NET Memory Cache 4.0_Perf_Library_Lock_PID_424
+.NETFramework_Perf_Library_Lock_PID_424
+ASP_Perf_Library_Lock_PID_424
+ASP.NET_Perf_Library_Lock_PID_424
+ASP.NET_2.0.50727_Perf_Library_Lock_PID_424
+ASP.NET_4.0.30319_Perf_Library_Lock_PID_424
+ASP.NET_64_2.0.50727_Perf_Library_Lock_PID_424
+aspnet_state_Perf_Library_Lock_PID_424
+BITS_Perf_Library_Lock_PID_424
+ESENT_Perf_Library_Lock_PID_424
+Lsa_Perf_Library_Lock_PID_424
+MSDTC_Perf_Library_Lock_PID_424
+MSDTC Bridge 3.0.0.0_Perf_Library_Lock_PID_424
+MSDTC Bridge 4.0.0.0_Perf_Library_Lock_PID_424
+MSRS 2011 Web Service_Perf_Library_Lock_PID_424
+MSRS 2011 Windows Service_Perf_Library_Lock_PID_424
+MSSQL$CEMAR_ANALYTICS_Perf_Library_Lock_PID_424
+MSSQLSERVER_Perf_Library_Lock_PID_424
+PerfDisk_Perf_Library_Lock_PID_424
+PerfNet_Perf_Library_Lock_PID_424
+PerfOS_Perf_Library_Lock_PID_424
+PerfProc_Perf_Library_Lock_PID_424
+RemoteAccess_Perf_Library_Lock_PID_424
+ServiceModelEndpoint 3.0.0.0_Perf_Library_Lock_PID_424
+ServiceModelOperation 3.0.0.0_Perf_Library_Lock_PID_424
+ServiceModelService 3.0.0.0_Perf_Library_Lock_PID_424
+SMSvcHost 3.0.0.0_Perf_Library_Lock_PID_424
+SMSvcHost 4.0.0.0_Perf_Library_Lock_PID_424
+Spooler_Perf_Library_Lock_PID_424
+SQLAgent$CEMAR_ANALYTICS_Perf_Library_Lock_PID_424
+SQLSERVERAGENT_Perf_Library_Lock_PID_424
+TapiSrv_Perf_Library_Lock_PID_424
+Tcpip_Perf_Library_Lock_PID_424
+TermService_Perf_Library_Lock_PID_424
+usbhub_Perf_Library_Lock_PID_424
+W3SVC_Perf_Library_Lock_PID_424
+Windows Workflow Foundation 3.0.0.0_Perf_Library_Lock_PID_424
+Windows Workflow Foundation 4.0.0.0_Perf_Library_Lock_PID_424
+653C2766AE93470EAE04CC73F9F953AE.MAI
+9E9C227D0C024479BCADBCDE114C0EDF.MAI
+IMAPCDebugLog
+IMAPCActivityLog
+IMAPCW3CLog
+IMAPCDebugLog
+IMAPCActivityLog
+IMAPCW3CLog
+LOADPERF_MUTEX
+TermService_Perf_Library_Lock_PID_5b8
+LOADPERF_MUTEX
+.NET CLR Data_Perf_Library_Lock_PID_5b8
+.NET CLR Networking_Perf_Library_Lock_PID_5b8
+.NET CLR Networking 4.0.0.0_Perf_Library_Lock_PID_5b8
+.NET Data Provider for Oracle_Perf_Library_Lock_PID_5b8
+.NET Data Provider for SqlServer_Perf_Library_Lock_PID_5b8
+.NET Memory Cache 4.0_Perf_Library_Lock_PID_5b8
+.NETFramework_Perf_Library_Lock_PID_5b8
+ASP_Perf_Library_Lock_PID_5b8
+ASP.NET_Perf_Library_Lock_PID_5b8
+ASP.NET_2.0.50727_Perf_Library_Lock_PID_5b8
+ASP.NET_4.0.30319_Perf_Library_Lock_PID_5b8
+ASP.NET_64_2.0.50727_Perf_Library_Lock_PID_5b8
+aspnet_state_Perf_Library_Lock_PID_5b8
+BITS_Perf_Library_Lock_PID_5b8
+ESENT_Perf_Library_Lock_PID_5b8
+Lsa_Perf_Library_Lock_PID_5b8
+MSDTC_Perf_Library_Lock_PID_5b8
+MSDTC Bridge 3.0.0.0_Perf_Library_Lock_PID_5b8
+MSDTC Bridge 4.0.0.0_Perf_Library_Lock_PID_5b8
+MSRS 2011 Web Service_Perf_Library_Lock_PID_5b8
+MSRS 2011 Windows Service_Perf_Library_Lock_PID_5b8
+MSSQL$CEMAR_ANALYTICS_Perf_Library_Lock_PID_5b8
+MSSQLSERVER_Perf_Library_Lock_PID_5b8
+PerfDisk_Perf_Library_Lock_PID_5b8
+PerfNet_Perf_Library_Lock_PID_5b8
+PerfOS_Perf_Library_Lock_PID_5b8
+PerfProc_Perf_Library_Lock_PID_5b8
+RemoteAccess_Perf_Library_Lock_PID_5b8
+ServiceModelEndpoint 3.0.0.0_Perf_Library_Lock_PID_5b8
+ServiceModelOperation 3.0.0.0_Perf_Library_Lock_PID_5b8
+ServiceModelService 3.0.0.0_Perf_Library_Lock_PID_5b8
+SMSvcHost 3.0.0.0_Perf_Library_Lock_PID_5b8
+SMSvcHost 4.0.0.0_Perf_Library_Lock_PID_5b8
+Spooler_Perf_Library_Lock_PID_5b8
+SQLAgent$CEMAR_ANALYTICS_Perf_Library_Lock_PID_5b8
+SQLSERVERAGENT_Perf_Library_Lock_PID_5b8
+TapiSrv_Perf_Library_Lock_PID_5b8
+Tcpip_Perf_Library_Lock_PID_5b8
+usbhub_Perf_Library_Lock_PID_5b8
+W3SVC_Perf_Library_Lock_PID_5b8
+Windows Workflow Foundation 3.0.0.0_Perf_Library_Lock_PID_5b8
+Windows Workflow Foundation 4.0.0.0_Perf_Library_Lock_PID_5b8
+WmiApRpl_Perf_Library_Lock_PID_5b8
+DPLVSHMM_clienaa8_Setup_Mutex
+DPLVSHMM_clienaa8_Setup
+17F761E06B9A417FA4F44F2B8EE4D294.MAI
+CFA8D0E4DD6443C4B717207EAB57093A.MAI
+DBWinMutex
+MTADebugLog
+MTAActivityLog
+POCDebugLog
+POCActivityLog
+9C7446A74384437AB2F37B7C3D6AC790.MAI
+40C1D8071E054A539E4FDB7E8F254C1F.MAI
+POPSDebugLogFile
+POPSW3CLogFile
+POPSActivityLogFile
+7F88CF6B4A3E432498047A2BEC0FD872.MAI
+BCA2336899BA4B78BCBFAAF0EBB6B4E5.MAI
+SMTPCW3CLog
+SMTPCActivityLog
+SMTPCDebugLog
+SQL_PERF_DATA_MUTEX$CEMAR_ANALYTICS
+DBWinMutex
+SQL_PERF_DATA_MUTEX$MSSQLSERVER
+DBWinMutex
+DBWinMutex
+SNMP_Wow64_Mutex{33677e55-82df-4a65-a463-887f039c394d}
+SNMP_Wow64_TRAPQ_Mutex{5d3cedee-ebd4-4403-9e3e-5f6a5dc971a9}
+LOADPERF_MUTEX
+RasPbFile
+SNMP_Wow64_Mutex{33677e55-82df-4a65-a463-887f039c394d}
+SNMP_Wow64_TRAPQ_Mutex{5d3cedee-ebd4-4403-9e3e-5f6a5dc971a9}
+Instance2:  ESENT Performance Data Schema Version 255
+RasPbFile
+RasPbFile
+d3b1bbc7-c020-4056-9ded-7c6f40b5a2fc
+3a886eb8-fe40-4d0a-b78b-9e0bcb683fb7
+DBWinMutex
+ASP_PERFMON_MUTEX
+SQLAGENT_PERF_DATA_MUTEX$CEMAR_ANALYTICS
+DBWinMutex
+DBWinMutex
+SQLAGENT_PERF_DATA_MUTEX$MSSQLSERVER
+TSLicensingLock
+LOADPERF_MUTEX
+MSDTC_STATS_EVENT
+mtxLogMeInLogger
+PerfOS_Perf_Library_Lock_PID_2498
+mtxLogMeInLogger
+.NET CLR Networking_Perf_Library_Lock_PID_2498
+MSSQLSERVER_Perf_Library_Lock_PID_2498
+PerfDisk_Perf_Library_Lock_PID_2498
+LRIEElevationPolicyMutex
+LRIEElevationPolicyMutex
+LogMeInMutex
+LogMeIn_SSH_PRIVSEP_IN_PROGRESS
+WindowsUpdateTracingMutex
+RemoteAccess_Perf_Library_Lock_PID_2498
+SMSvcHost 3.0.0.0_Perf_Library_Lock_PID_2498
+MSRS 2011 Web Service_Perf_Library_Lock_PID_2498
+ServiceModelService 3.0.0.0_Perf_Library_Lock_PID_2498
+.NET Data Provider for Oracle_Perf_Library_Lock_PID_2498
+MSSQL$CEMAR_ANALYTICS_Perf_Library_Lock_PID_2498
+.NETFramework_Perf_Library_Lock_PID_2498
+.NET CLR Networking 4.0.0.0_Perf_Library_Lock_PID_2498
+Spooler_Perf_Library_Lock_PID_2498
+SMSvcHost 4.0.0.0_Perf_Library_Lock_PID_2498
+MSDTC Bridge 3.0.0.0_Perf_Library_Lock_PID_2498
+ServiceModelOperation 3.0.0.0_Perf_Library_Lock_PID_2498
+ServiceModelEndpoint 3.0.0.0_Perf_Library_Lock_PID_2498
+.NET CLR Data_Perf_Library_Lock_PID_2498
+ZonesCacheCounterMutex
+ZonesLockedCacheCounterMutex
+MSDTC Bridge 4.0.0.0_Perf_Library_Lock_PID_2498
+BITS_Perf_Library_Lock_PID_2498
+ASP.NET_Perf_Library_Lock_PID_2498
+.NET Memory Cache 4.0_Perf_Library_Lock_PID_2498
+ASP.NET_4.0.30319_Perf_Library_Lock_PID_2498
+aspnet_state_Perf_Library_Lock_PID_2498
+MSDTC_Perf_Library_Lock_PID_2498
+ASP.NET_2.0.50727_Perf_Library_Lock_PID_2498
+ESENT_Perf_Library_Lock_PID_2498
+.NET Data Provider for SqlServer_Perf_Library_Lock_PID_2498
+Lsa_Perf_Library_Lock_PID_2498
+ASP_Perf_Library_Lock_PID_2498
+ASP.NET_64_2.0.50727_Perf_Library_Lock_PID_2498
+W3SVC_Perf_Library_Lock_PID_2498
+TermService_Perf_Library_Lock_PID_2498
+Tcpip_Perf_Library_Lock_PID_2498
+PerfProc_Perf_Library_Lock_PID_2498
+TapiSrv_Perf_Library_Lock_PID_2498
+SQLSERVERAGENT_Perf_Library_Lock_PID_2498
+PerfNet_Perf_Library_Lock_PID_2498
+SQLAgent$CEMAR_ANALYTICS_Perf_Library_Lock_PID_2498
+MSRS 2011 Windows Service_Perf_Library_Lock_PID_2498
+Windows Workflow Foundation 3.0.0.0_Perf_Library_Lock_PID_2498
+usbhub_Perf_Library_Lock_PID_2498
+Windows Workflow Foundation 4.0.0.0_Perf_Library_Lock_PID_2498
+WmiApRpl_Perf_Library_Lock_PID_2498
+DBWinMutex
+MSCTF.Asm.MutexDefault3
+CicLoadWinStaWinSta0
+MSCTF.CtfMonitorInstMutexDefault3
+RdpClipAlreadyRunningMutex
+DBWinMutex
+SessionImmersiveColorMutex
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_1024.db!dfMaintainer
+MSCTF.Asm.MutexDefault3
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_48.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_256.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_exif.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:thumbcache_1024.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_wide.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:thumbcache_32.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_wide_alternate.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_exif.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:thumbcache_256.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:thumbcache_1600.db!dfMaintainer
+ALTTAB_RUNNING_MUTEX
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:thumbcache_idx.db!ThumbnailCacheInit
+_!SHMSFTHISTORY!_
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_wide.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:thumbcache_wide_alternate.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_sr.db!dfMaintainer
+ZonesCacheCounterMutex
+ZonesLockedCacheCounterMutex
+_SHuassist.mtx
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:thumbcache_96.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_idx.db!rwWriterMutex
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_96.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_idx.db!IconCacheInit
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_idx.db!rwWriterMutex
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_16.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:thumbcache_48.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:thumbcache_sr.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_sr.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_1024.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:thumbcache_wide.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_wide_alternate.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_96.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_1600.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_1600.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_32.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:thumbcache_16.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:thumbcache_48.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:thumbcache_1024.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_idx.db!IconCacheInit
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_256.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_16.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_48.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:thumbcache_idx.db!rwWriterMutex
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:thumbcache_sr.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_32.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:thumbcache_exif.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:thumbcache_16.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:thumbcache_wide.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:thumbcache_idx.db!rwWriterMutex
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:thumbcache_96.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:thumbcache_256.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:thumbcache_32.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:thumbcache_wide_alternate.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:thumbcache_exif.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:thumbcache_1600.db!dfMaintainer
+TM.750ce7b0-e5fd-454f-9fad-2f66513dfa1b
+MSCTF.Asm.MutexDefault3
+SessionImmersiveColorMutex
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_idx.db!rwWriterMutex
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_wide_alternate.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_exif.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_wide.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_sr.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_1600.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_1024.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_256.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_96.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_48.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_32.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_16.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_idx.db!IconCacheInit
+ZonesLockedCacheCounterMutex
+ZonesCacheCounterMutex
+LRIEElevationPolicyMutex
+LRIEElevationPolicyMutex
+LogMeInGuiMutex
+MSCTF.Asm.MutexDefault3
+ZonesCacheCounterMutex
+ZonesLockedCacheCounterMutex
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_96.db!dfMaintainer
+ZonesCacheCounterMutex
+ZonesLockedCacheCounterMutex
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_idx.db!IconCacheInit
+__DDrawCheckExclMode__
+__DDrawExclMode__
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_wide_alternate.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_32.db!dfMaintainer
+DBWinMutex
+DW_S-1-5-21-497108304-975191429-3297203846-500
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_wide.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_256.db!dfMaintainer
+MSCTF.Asm.MutexDefault3
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_1024.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_1600.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_sr.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_exif.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_16.db!dfMaintainer
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_idx.db!rwWriterMutex
+C::Users:Administrator:AppData:Local:Microsoft:Windows:Explorer:iconcache_48.db!dfMaintainer
+!$_SAVI_!$$!_EVENT_$!__UpdateMutex
+!$_SAVI_!$$!_EVENT_$!__MmfMutexSAV-Info
+!$_SAVI_!$$!_EVENT_$!__MmfMutexSAV-000a
+DBWinMutex
+!$_SAVI_!$$!_EVENT_$!__MmfMutexSAV-0003
+!$_SAVI_!$$!_EVENT_$!__MmfMutexSAV-000b
+!$_SAVI_!$$!_EVENT_$!__MmfMutexSAV-000d
+!$_SAVI_!$$!_EVENT_$!__MmfMutexSAV-0007
+!$_SAVI_!$$!_EVENT_$!__UpdateMutex
+DBWinMutex
+CLbf9ba0aa-Zt13zUlqaL57UHl8ZWgrBpwDfW0BKv
+DBWinMutex
+CL9abdcf4-Zt13zUlqaL57UHl8ZWgrBpwDfW0BKv
+BcdSyncMutant
+DBWinMutex
+DBWinMutex
+MSCTF.Asm.MutexDefault3
+MSCTF.Asm.MutexDefault3
+DBWinMutex
+MSCTF.Asm.MutexDefault3
