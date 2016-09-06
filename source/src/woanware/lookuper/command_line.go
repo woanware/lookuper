@@ -117,40 +117,6 @@ func setupCli(app *cli.App) {
 			},
 		},
 		{
-			Name:    "md5all",
-			Usage:   "Check MD5 hashes via ThreatExpert and VirusTotal",
-			Action:  func(c *cli.Context) error {
-
-				err := checkInputFile(c.String("input"))
-				if err != nil {
-					return err
-				}
-
-				err = checkOutputDirectory(c.String("output"))
-				if err != nil {
-					return err
-				}
-
-				if len(config.VtApiKeys) > 0 {
-					run(dataTypeMd5All, c.String("input"), c.String("output"), config.VtApiKeys)
-				} else {
-					success, apiKeys := getApiKeys(c.String("api"))
-					if success == false {
-						return errors.New("No API keys supplied")
-					}
-					run(dataTypeMd5All, c.String("input"), c.String("output"), apiKeys)
-				}
-
-				return nil
-			},
-			Flags: []cli.Flag{
-				inputFileFlag,
-				outputDirFlag,
-				apiFlag,
-				privateKeyFlag,
-			},
-		},
-		{
 			Name:    "sha256vt",
 			Usage:   "Check SHA256 hashes via VirusTotal",
 			Action:  func(c *cli.Context) error {
@@ -301,7 +267,7 @@ func setupCli(app *cli.App) {
 					return err
 				}
 
-				run(dataTypeStringTe, c.String("input"), c.String("output"), []string{})
+				run(dataTypeStringTe, c.String("input"), c.String("output"), []string{FAKE_API_KEY})
 				return nil
 			},
 			Flags: []cli.Flag{

@@ -128,7 +128,7 @@ func (w *Worker) Run(
 		// Create a ticker that elapses every seconds, so we can stop the worker, since time.sleep cannot be interrupted
 		tickerCounter := 0
 		ticker := time.NewTicker(time.Duration(1) * time.Second)
-		for _ = range ticker.C {
+		for range ticker.C {
 			tickerCounter += 1
 			if tickerCounter == 3600 {
 				log.Printf("Unpausing processing")
@@ -351,9 +351,8 @@ func (w *Worker) doesDataExistInDb(staleTimestamp time.Time, data string) (error
 		teHash := TeHash{}
 		return teHash.DoesDataExist(data, staleTimestamp)
 	case dataTypeStringTe:
-		var temp TeString
-		err := dbMap.SelectOne(&temp, "SELECT * FROM te_string WHERE string = $1", data)
-		return w.validateDbData(temp.UpdateDate, staleTimestamp.Unix(), err)
+		teString := TeString{}
+		return teString.DoesDataExist(data, staleTimestamp)
 	case dataTypeGsb:
 		md5 := util.Md5HashString(data)
 		var temp GoogleSafeBrowsing

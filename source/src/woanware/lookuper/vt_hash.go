@@ -29,6 +29,7 @@ type VtHash struct {
 
 // Processes a VT API request for multiple hashes
 func(h *VtHash) Process(data []string) int8 {
+
 	frr, err := h.govtc.GetFileReports(data)
 
 	if err != nil {
@@ -36,7 +37,7 @@ func(h *VtHash) Process(data []string) int8 {
 			return WORK_RESPONSE_KEY_FAILED
 		}
 
-		log.Printf("Error requesting VT MD5 report: %v", err)
+		log.Printf("Error requesting VT hash report: %v", err)
 		return WORK_RESPONSE_ERROR
 	}
 
@@ -66,13 +67,14 @@ func  (h *VtHash) DoesDataExist(isMd5 bool, data string, staleTimestamp time.Tim
 
 // Inserts a new hash record, if that fails due to it already existing, then retrieve details and update
 func (h *VtHash) setRecord(fr govt.FileReport) int8 {
+
 	hash := new(VtHash)
 	h.updateObject(hash, fr)
 
 	err := dbMap.Insert(hash)
 	if err != nil {
 		if strings.Contains(strings.ToLower(err.Error()), "duplicate key value violates") == false {
-			//log.Error("Error inserting VT hash record (%d): %v (%s)", w.JobId, err, hash.Md5)
+			log.Error("Error inserting VT hash record: %v (%s)", err, hash.Md5)
 			return WORK_RESPONSE_ERROR
 		}
 
@@ -95,6 +97,7 @@ func (h *VtHash) setRecord(fr govt.FileReport) int8 {
 
 // Generic method to copy the VT data to our hash object
 func (h *VtHash) updateObject(hash *VtHash, fp govt.FileReport) {
+
 	hash.Md5 = strings.ToLower(fp.Md5)
 	hash.Sha256 = strings.ToLower(fp.Sha256)
 	hash.Positives = int16(fp.Positives)

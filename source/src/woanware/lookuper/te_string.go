@@ -63,6 +63,16 @@ func (s *TeString) Process(data string) int8 {
 	return WORK_RESPONSE_ERROR
 }
 
+//
+func (s *TeString) DoesDataExist(data string, staleTimestamp time.Time) (error, bool) {
+
+	var temp TeString
+	err := dbMap.SelectOne(&temp, "SELECT * FROM te_string WHERE string = $1", data)
+	err, exists := validateDbData(temp.UpdateDate, staleTimestamp.Unix(), err)
+
+	return err, exists
+}
+
 // Processes the TE response for a string
 func (s *TeString) processResponse(data string, body string) int8 {
 	regexMatch := regexTeStringMatch.FindAllStringSubmatch(string(body), -1)

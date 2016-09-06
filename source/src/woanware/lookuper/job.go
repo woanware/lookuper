@@ -69,7 +69,7 @@ func (j *Job) GenerateCsv(outputFilePath string) {
 		j.OutputTeHashes(outputFilePath)
 
 	case dataTypeStringTe:
-		j.OutputTeHashes(outputFilePath)
+		j.OutputTeStrings(outputFilePath)
 
 	case dataTypeGsb:
 		j.OutputGsb(outputFilePath)
