@@ -73,7 +73,7 @@ GLOBAL OPTIONS:
 ```
 
 An example command line and output is shown below:
-````
+```
 ./lookuper md5vt -i md5-28.txt -o .
 2016/09/06 15:18:23 Data type: MD5 (VT)
 2016/09/06 15:18:23 Loading data
@@ -83,9 +83,38 @@ An example command line and output is shown below:
 2016/09/06 15:18:24 Batch size: 4
 2016/09/06 15:20:38 Complete
 2016/09/06 15:20:38 Cache hits: 0
-
 ```
 
+## Compilation
+
+This document assumes that the **golang** tool set has been installed.
+
+Golang applications always have a **src** directory which contains the applications source code, along with any associated projects that are referenced by the primary application. The following shows where the applications source code resides:
+
+    /lookuper/source/src/woanware
+
+### gb
+
+The project uses [gb](https://getgb.io) for building the project. **gb** allows for reproducible builds and vendoring so that all dependencies are kept with the project source.
+
+### Compile with gb
+
+To compile the application use the following commands (assuming the same directory structure):
+```
+$ cd /lookuper/source
+$ gb build all
 ```
 
+### Compile under Windows
+
+The [go-sqlite3](https://github.com/mattn/go-sqlite3) database driver used to access the  Sqlite database is a cgo package, therefore gcc is needed to build the application. On linux this is generally not an issue as most **normal** people :-) have gcc installed.
+
+On Windows, that is not always the case. So to build on Windows (x64), perform the following steps:
+
+- Download [tdm-gcc (x64)](http://tdm-gcc.tdragon.net/download) and install. Accept the defaults.
+- Open a command prompt and CD to:
 ```
+C:\TDM-GCC-64
+```
+- Execute the **mingwvars.bat** file which will get the correct environment variables
+- Then CD to the lookuper source code and follow the same instructions for compiling using **gb**
