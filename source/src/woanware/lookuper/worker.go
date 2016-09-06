@@ -345,14 +345,11 @@ func (w *Worker) doesDataExistInDb(staleTimestamp time.Time, data string) (error
 		vtDomain := VtDomainResolution{govtc: w.govtc}
 		return vtDomain.DoesDataExist(data, staleTimestamp)
 	case dataTypeUrlVt:
-		md5 := util.Md5HashString(data)
-		var temp VtUrl
-		err := dbMap.SelectOne(&temp, "SELECT * FROM vt_url WHERE url_md5 = $1", md5)
-		return w.validateDbData(temp.UpdateDate, staleTimestamp.Unix(), err)
+		vtUrl := VtUrl{govtc: w.govtc}
+		return vtUrl.DoesDataExist(data, staleTimestamp)
 	case dataTypeMd5Te:
-		var temp TeHash
-		err := dbMap.SelectOne(&temp, "SELECT * FROM te_hash WHERE md5 = $1", data)
-		return w.validateDbData(temp.UpdateDate, staleTimestamp.Unix(), err)
+		teHash := TeHash{}
+		return teHash.DoesDataExist(data, staleTimestamp)
 	case dataTypeStringTe:
 		var temp TeString
 		err := dbMap.SelectOne(&temp, "SELECT * FROM te_string WHERE string = $1", data)

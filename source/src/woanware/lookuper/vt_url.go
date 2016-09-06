@@ -65,10 +65,16 @@ func (u *VtUrl) Process(data []string) int8 {
 	return WORK_RESPONSE_OK
 }
 
-//// Processes the VT response for a VT URL report
-//func (u *VtUrl) processResponse(ur *govt.UrlReport) int8 {
-//	return u.setUrlRecord(*ur)
-//}
+//
+func (u *VtUrl) DoesDataExist(data string, staleTimestamp time.Time) (error, bool) {
+
+	md5 := util.Md5HashString(data)
+	var temp VtUrl
+	err := dbMap.SelectOne(&temp, "SELECT * FROM vt_url WHERE url_md5 = $1", md5)
+	err, exists := validateDbData(temp.UpdateDate, staleTimestamp.Unix(), err)
+
+	return err, exists
+}
 
 // Inserts a new URL record, if that fails due to it already existing, then retrieve details and update
 func (u *VtUrl) setRecord(ur govt.UrlReport) int8 {

@@ -106,8 +106,10 @@ func (j *Job) OutputVtHashes(outputDir string, isSha256 bool) {
 		}
 
 		if err != nil {
-			log.Printf("Error retrieving data for VT hash output: %v", err)
-			break
+			if strings.Contains(strings.ToLower(err.Error()), "no rows in result set") == false {
+				log.Printf("Error retrieving data for VT hash output: %v", err)
+			}
+			continue
 		}
 
 		csvWriter.Write([]string{
@@ -146,8 +148,10 @@ func (j *Job) OutputVtUrls(outputDir string) {
 		err = dbMap.SelectOne(&temp, "SELECT * FROM vt_url WHERE url_md5 = $1", md5)
 
 		if err != nil {
-			log.Printf("Error retrieving data for VT URL output: %v", err)
-			break
+			if strings.Contains(strings.ToLower(err.Error()), "no rows in result set") == false {
+				log.Printf("Error retrieving data for VT URL output: %v", err)
+			}
+			continue
 		}
 
 		csvWriter.Write([]string{
@@ -185,7 +189,9 @@ func (j *Job) OutputVtIps(outputDir string) {
 		ip, _ = util.InetAton(d1)
 		_, err = dbMap.Select(&tempRes, "SELECT * FROM vt_ip_resolution WHERE ip = $1", ip)
 		if err != nil {
-			log.Printf("Error retrieving data for VT IP resolution output: %v", err)
+			if strings.Contains(strings.ToLower(err.Error()), "no rows in result set") == false {
+				log.Printf("Error retrieving data for VT IP resolution output: %v", err)
+			}
 			continue
 		}
 
@@ -215,7 +221,9 @@ func (j *Job) OutputVtIps(outputDir string) {
 		ip, _ := util.InetAton(d2)
 		_, err = dbMap.Select(&tempUrls, "SELECT * FROM vt_ip_detected_url WHERE ip = $1", ip)
 		if err != nil {
-			log.Printf("Error retrieving data for VT IP detected URL output: %v", err)
+			if strings.Contains(strings.ToLower(err.Error()), "no rows in result set") == false {
+				log.Printf("Error retrieving data for VT IP detected URL output: %v", err)
+			}
 			continue
 		}
 
@@ -256,7 +264,9 @@ func (j *Job) OutputVtDomains(outputDir string) {
 		md5 = util.Md5HashString(d1)
 		_, err = dbMap.Select(&tempRes, "SELECT * FROM vt_domain_resolution WHERE domain_md5 = $1", md5)
 		if err != nil {
-			log.Printf("Error retrieving data for VT domain resolution output: %v", err)
+			if strings.Contains(strings.ToLower(err.Error()), "no rows in result set") == false {
+				log.Printf("Error retrieving data for VT domain resolution output: %v", err)
+			}
 			continue
 		}
 
@@ -286,7 +296,9 @@ func (j *Job) OutputVtDomains(outputDir string) {
 		md5 = util.Md5HashString(d2)
 		_, err = dbMap.Select(&tempUrls, "SELECT * FROM vt_domain_detected_url WHERE domain_md5 = $1", md5)
 		if err != nil {
-			log.Printf("Error retrieving data for VT domain detected URL output: %v", err)
+			if strings.Contains(strings.ToLower(err.Error()), "no rows in result set") == false {
+				log.Printf("Error retrieving data for VT domain detected URL output: %v", err)
+			}
 			continue
 		}
 
@@ -323,8 +335,10 @@ func (j *Job) OutputTeHashes(outputDir string) {
 
 		err = dbMap.SelectOne(&temp, "SELECT * FROM te_hash WHERE md5 = $1", strings.ToLower(d))
 		if err != nil {
-			log.Printf("Error retrieving data for TE hash output: %v", err)
-			break
+			if strings.Contains(strings.ToLower(err.Error()), "no rows in result set") == false {
+				log.Printf("Error retrieving data for TE hash output: %v", err)
+			}
+			continue
 		}
 
 		csvWriter.Write([]string{
@@ -357,8 +371,10 @@ func (j *Job) OutputTeStrings(outputDir string) {
 
 		err = dbMap.SelectOne(&temp, "SELECT * FROM te_string WHERE LOWER(string) = $1", strings.ToLower(d))
 		if err != nil {
-			log.Printf("Error retrieving data for TE string output: %v", err)
-			break
+			if strings.Contains(strings.ToLower(err.Error()), "no rows in result set") == false {
+				log.Printf("Error retrieving data for TE string output: %v", err)
+			}
+			continue
 		}
 
 		csvWriter.Write([]string{
@@ -393,6 +409,9 @@ func (j *Job) OutputGsb(outputDir string) {
 		md5 = util.Md5HashString(d)
 		err = dbMap.SelectOne(&gsb, "SELECT * FROM google_safe_browsing WHERE url_md5 = $1", md5)
 		if err != nil {
+			if strings.Contains(strings.ToLower(err.Error()), "no rows in result set") == false {
+				log.Printf("Error retrieving data for Google Safe Browsing output: %v", err)
+			}
 			continue
 		}
 

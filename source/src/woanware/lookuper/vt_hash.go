@@ -49,24 +49,20 @@ func(h *VtHash) Process(data []string) int8 {
 	return WORK_RESPONSE_OK
 }
 
-//// Processes a VT API request for a single hash
-//func (h *VtHash) ProcessBatchMd5Vt(data string) int8 {
-//	frp, err := h.govtc.GetFileReport(data)
-//	if err != nil {
-//		if strings.Contains(strings.ToLower(err.Error()), "unexpected status code: 204") {
-//			return WORK_RESPONSE_KEY_FAILED
-//		}
 //
-//		log.Printf("Error requesting VT report (MD5): %v", err)
-//		return WORK_RESPONSE_ERROR
-//	}
-//
-//	if frp.ResponseCode == 1 {
-//		return h.processFileReport(frp)
-//	}
-//
-//	return WORK_RESPONSE_OK
-//}
+func  (h *VtHash) DoesDataExist(isMd5 bool, data string, staleTimestamp time.Time) (error, bool) {
+
+	sql := "SELECT * FROM vt_hash WHERE md5 = $1"
+	if isMd5 == false {
+		sql = "SELECT * FROM vt_hash WHERE sha256 = $1"
+	}
+
+	var hash VtHash
+	err := dbMap.SelectOne(&hash, sql, strings.ToLower(data))
+	err, exists := validateDbData(hash.UpdateDate, staleTimestamp.Unix(), err)
+
+	return err, exists
+}
 
 // Inserts a new hash record, if that fails due to it already existing, then retrieve details and update
 func (h *VtHash) setRecord(fr govt.FileReport) int8 {
@@ -95,21 +91,6 @@ func (h *VtHash) setRecord(fr govt.FileReport) int8 {
 	}
 
 	return WORK_RESPONSE_OK
-}
-
-//
-func  (h *VtHash) DoesDataExist(isMd5 bool, data string, staleTimestamp time.Time) (error, bool) {
-
-	sql := "SELECT * FROM vt_hash WHERE md5 = $1"
-	if isMd5 == false {
-		sql = "SELECT * FROM vt_hash WHERE sha256 = $1"
-	}
-
-	var hash VtHash
-	err := dbMap.SelectOne(&hash, sql, strings.ToLower(data))
-	err, exists := validateDbData(hash.UpdateDate, staleTimestamp.Unix(), err)
-
-	return err, exists
 }
 
 // Generic method to copy the VT data to our hash object

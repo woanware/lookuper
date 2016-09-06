@@ -62,6 +62,16 @@ func (h *TeHash) Process(data string) int8 {
 	return WORK_RESPONSE_ERROR
 }
 
+//
+func (h *TeHash) DoesDataExist(data string, staleTimestamp time.Time) (error, bool) {
+
+	var temp TeHash
+	err := dbMap.SelectOne(&temp, "SELECT * FROM te_hash WHERE md5 = $1", data)
+	err, exists := validateDbData(temp.UpdateDate, staleTimestamp.Unix(), err)
+
+	return err, exists
+}
+
 // Processes the TE response for a MD5
 func (h *TeHash) processResponse(md5 string, body string) int8 {
 

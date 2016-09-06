@@ -108,7 +108,7 @@ func setupCli(app *cli.App) {
 					return err
 				}
 
-				run(dataTypeMd5Te, c.String("input"), c.String("output"), []string{})
+				run(dataTypeMd5Te, c.String("input"), c.String("output"), []string{FAKE_API_KEY})
 				return nil
 			},
 			Flags: []cli.Flag{
