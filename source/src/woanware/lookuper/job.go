@@ -51,10 +51,10 @@ func (j *Job) GenerateCsv(outputFilePath string) {
 
 	switch j.Type {
 	case dataTypeMd5Vt:
-		j.OutputVtHashCsv(outputFilePath, false)
+		j.OutputVtHashes(outputFilePath, false)
 
 	case dataTypeSha256Vt:
-		j.OutputVtHashCsv(outputFilePath, true)
+		j.OutputVtHashes(outputFilePath, true)
 
 	case dataTypeUrlVt:
 		j.OutputVtUrls(outputFilePath)
@@ -62,49 +62,22 @@ func (j *Job) GenerateCsv(outputFilePath string) {
 	case dataTypeIpVt:
 		j.OutputVtIps(outputFilePath)
 
-	//	_,_, tempCsvRes, tempCsvDu := j.GenerateJobCsvForIps(config.DataFolder)
-	//	err := createAndWriteZipFile(zipWriter, FILE_NAME_IP_RESOLUTIONS, j.Id, tempCsvRes, false)
-	//	if err != nil {
-	//		//return fmt.Errorf("Error creating CSV results zip file (%d): %v", j.Id, err), []byte{}
-	//	}
-	//
-	//	err = createAndWriteZipFile(zipWriter, FILE_NAME_IP_DETECTED_URLS, j.Id, tempCsvDu, true)
-	//	if err != nil {
-	//		//return fmt.Errorf("Error creating CSV results zip file (%d): %v", j.Id, err), []byte{}
-	//	}
-	//
-	//case dataTypeDomainVt:
-	//	_,_, tempCsvRes, tempCsvDu := j.GenerateJobCsvForDomains(config.DataFolder)
-	//	err := createAndWriteZipFile(zipWriter, FILE_NAME_DOMAIN_RESOLUTIONS, j.Id, tempCsvRes, false)
-	//	if err != nil {
-	//		//return fmt.Errorf("Error creating CSV results zip file (%d): %v", j.Id, err), []byte{}
-	//	}
-	//
-	//	err = createAndWriteZipFile(zipWriter, FILE_NAME_DOMAIN_DETECTED_URLS, j.Id, tempCsvDu, true)
-	//	if err != nil {
-	//		return fmt.Errorf("Error creating CSV results zip file (%d): %v", j.Id, err), []byte{}
-	//	}
-	//	return nil, buf.Bytes()
-	//
-	//case dataTypeMd5Te:
-	//	_, tempCsv := j.GenerateJobCsvForHashesTe(config.DataFolder)
-	//	err := createAndWriteZipFile(zipWriter, FILE_NAME_HASHES, j.Id, tempCsv, true)
-	//	if err != nil {
-	//		//return fmt.Errorf("Error creating CSV results zip file (%d): %v", j.Id, err), []byte{}
-	//	}
-	//case dataTypeUrlG:
-	//	_,_, tempCsv := j.GenerateJobCsvForUrlsG(config.DataFolder)
-	//	err := createAndWriteZipFile(zipWriter, FILE_NAME_URLS, j.Id, tempCsv, true)
-	//	if err != nil {
-	//		//return fmt.Errorf("Error creating CSV results zip file (%d): %v", j.Id, err), []byte{}
-	//	}
-	//	return nil, buf.Bytes()
-	//
+	case dataTypeDomainVt:
+		j.OutputVtDomains(outputFilePath)
+
+	case dataTypeMd5Te:
+		j.OutputTeHashes(outputFilePath)
+
+	case dataTypeStringTe:
+		j.OutputTeHashes(outputFilePath)
+
+	case dataTypeGsb:
+		j.OutputGsb(outputFilePath)
 	}
 }
 
 // Creates a CSV results file for hash jobs
-func (j *Job) OutputVtHashCsv(outputDir string, isSha256 bool) {
+func (j *Job) OutputVtHashes(outputDir string, isSha256 bool) {
 
 	w := Work{}
 	data := w.GetAllWork()
@@ -125,6 +98,7 @@ func (j *Job) OutputVtHashCsv(outputDir string, isSha256 bool) {
 
 	var temp VtHash
 	for _, d := range data {
+
 		if isSha256 == true {
 			err = dbMap.SelectOne(&temp, "SELECT * FROM vt_hash WHERE sha256 = $1", strings.ToLower(d))
 		} else {
@@ -167,8 +141,9 @@ func (j *Job) OutputVtUrls(outputDir string) {
 	var temp VtUrl
 	var md5 string
 	for _, d := range data {
+
 		md5 = util.Md5HashString(d)
-		err = dbMap.SelectOne(&temp, "SELECT * FROM url WHERE url_md5 = $1", md5)
+		err = dbMap.SelectOne(&temp, "SELECT * FROM vt_url WHERE url_md5 = $1", md5)
 
 		if err != nil {
 			log.Printf("Error retrieving data for VT URL output: %v", err)
@@ -193,341 +168,238 @@ func (j *Job) OutputVtIps(outputDir string) {
 	w := Work{}
 	data := w.GetAllWork()
 
-	file, err := os.Create(path.Join(outputDir, "lookuper-vt-url.csv"));
+	file1, err := os.Create(path.Join(outputDir, "lookuper-vt-ip-resolution.csv"));
+	defer file1.Close()
+	if err != nil {
+		log.Fatalf("Error opening output file: %v (%s)", err, path.Join(outputDir, "lookuper-vt-ip-resolution.csv"))
+	}
+
+	csvWriter := csv.NewWriter(file1)
+	csvWriter.Write([]string{"HostName", "LastResolved"})
+
+	var ip uint32
+	var tempRes []VtIpResolution
+
+	for _, d1 := range data {
+
+		ip, _ = util.InetAton(d1)
+		_, err = dbMap.Select(&tempRes, "SELECT * FROM vt_ip_resolution WHERE ip = $1", ip)
+		if err != nil {
+			log.Printf("Error retrieving data for VT IP resolution output: %v", err)
+			continue
+		}
+
+		for _, r := range tempRes {
+
+			csvWriter.Write([]string{
+				r.HostName,
+				util.ConvertInt64ToRfc3339String(r.LastResolved)})
+		}
+
+		tempRes = nil
+	}
+	csvWriter.Flush()
+
+	file2, err := os.Create(path.Join(outputDir, "lookuper-vt-ip-detected-url.csv"));
+	defer file2.Close()
+	if err != nil {
+		log.Fatalf("Error opening output file: %v (%s)", err, path.Join(outputDir, "lookuper-vt-ip-detected-url.csv"))
+	}
+
+	csvWriter = csv.NewWriter(file2)
+	csvWriter.Write([]string{"URL", "Positives", "Total", "ScanDate"})
+
+	var tempUrls []VtIpDetectedUrl
+	for _, d2 := range data {
+
+		ip, _ := util.InetAton(d2)
+		_, err = dbMap.Select(&tempUrls, "SELECT * FROM vt_ip_detected_url WHERE ip = $1", ip)
+		if err != nil {
+			log.Printf("Error retrieving data for VT IP detected URL output: %v", err)
+			continue
+		}
+
+		for _, u := range tempUrls {
+
+			csvWriter.Write([]string{
+				u.Url,
+				strconv.Itoa(int(u.Positives)),
+				strconv.Itoa(int(u.Total)),
+				util.ConvertInt64ToRfc3339String(u.ScanDate)})
+		}
+
+		tempUrls = nil
+	}
+	csvWriter.Flush()
+}
+
+// Creates a CSV results file for VT IP
+func (j *Job) OutputVtDomains(outputDir string) {
+
+	w := Work{}
+	data := w.GetAllWork()
+
+	file1, err := os.Create(path.Join(outputDir, "lookuper-vt-domain-resolution.csv"));
+	defer file1.Close()
+	if err != nil {
+		log.Fatalf("Error opening output file: %v (%s)", err, path.Join(outputDir, "lookuper-vt-domain-resolution.csv"))
+	}
+
+	csvWriter := csv.NewWriter(file1)
+	csvWriter.Write([]string{"Domain", "IPAddress", "LastResolved"})
+
+	var tempRes []VtDomainResolution
+	var md5 string
+
+	for _, d1 := range data {
+
+		md5 = util.Md5HashString(d1)
+		_, err = dbMap.Select(&tempRes, "SELECT * FROM vt_domain_resolution WHERE domain_md5 = $1", md5)
+		if err != nil {
+			log.Printf("Error retrieving data for VT domain resolution output: %v", err)
+			continue
+		}
+
+		for _, resolution := range tempRes {
+			csvWriter.Write([]string{
+				d1,
+				util.InetNtoa(resolution.IpAddress),
+				util.ConvertInt64ToRfc3339String(resolution.LastResolved)})
+		}
+
+		tempRes = nil
+	}
+	csvWriter.Flush()
+
+	file2, err := os.Create(path.Join(outputDir, "lookuper-vt-domain-detected-url.csv"));
+	defer file2.Close()
+	if err != nil {
+		log.Fatalf("Error opening output file: %v (%s)", err, path.Join(outputDir, "lookuper-vt-domain-detected-url.csv"))
+	}
+
+	csvWriter = csv.NewWriter(file2)
+	csvWriter.Write([]string{"Domain", "IPAddress", "LastResolved"})
+
+	var tempUrls []VtDomainDetectedUrl
+	for _, d2 := range data {
+
+		md5 = util.Md5HashString(d2)
+		_, err = dbMap.Select(&tempUrls, "SELECT * FROM vt_domain_detected_url WHERE domain_md5 = $1", md5)
+		if err != nil {
+			log.Printf("Error retrieving data for VT domain detected URL output: %v", err)
+			continue
+		}
+
+		for _, url := range tempUrls {
+			csvWriter.Write([]string{
+				url.Url,
+				strconv.Itoa(int(url.Positives)),
+				strconv.Itoa(int(url.Total)),
+				util.ConvertInt64ToRfc3339String(url.ScanDate)})
+		}
+
+		tempUrls = nil
+	}
+	csvWriter.Flush()
+}
+
+// Creates a CSV results file for hash jobs
+func (j *Job) OutputTeHashes(outputDir string) {
+
+	w := Work{}
+	data := w.GetAllWork()
+
+	file, err := os.Create(path.Join(outputDir, "lookuper-te-md5.csv"));
 	defer file.Close()
 	if err != nil {
-		log.Fatalf("Error opening output file: %v (%s)", err, path.Join(outputDir, "lookuper-vt-url.csv"))
+		log.Fatalf("Error opening output file: %v (%s)", err, path.Join(outputDir, "lookuper-te-md5.csv"))
 	}
 
 	csvWriter := csv.NewWriter(file)
-	csvWriter.Write([]string{"URL", "Permalink", "Positives", "Total", "ScanDate", "Scans"})
+	csvWriter.Write([]string{"MD5", "Name", "Severities", "ScanDate"})
 
-	var temp VtUrl
-	var md5 string
+	var temp TeHash
 	for _, d := range data {
-		md5 = util.Md5HashString(d)
-		err = dbMap.SelectOne(&temp, "SELECT * FROM url WHERE url_md5 = $1", md5)
 
+		err = dbMap.SelectOne(&temp, "SELECT * FROM te_hash WHERE md5 = $1", strings.ToLower(d))
 		if err != nil {
-			log.Printf("Error retrieving data for VT URL output: %v", err)
+			log.Printf("Error retrieving data for TE hash output: %v", err)
 			break
 		}
 
 		csvWriter.Write([]string{
-			temp.Url,
-			temp.Permalink,
-			strconv.Itoa(int(temp.Positives)),
-			strconv.Itoa(int(temp.Total)),
-			util.ConvertInt64ToRfc3339String(temp.ScanDate),
-			temp.Scans})
+			temp.Md5,
+			temp.Name,
+			temp.Severities,
+			util.ConvertInt64ToRfc3339String(temp.ScanDate)})
 	}
 
 	csvWriter.Flush()
 }
 
-//// Creates a CSV results file for hash jobs, also returns the total number
-//func (j *Job) GenerateJobCsvForHashesTe(dataFolder string) (total int, csvData []byte) {
-//
-//	data, err := loadJobData(j.Id, dataFolder)
-//	if err != nil {
-//		log.Errorf("Error loading job data: %v", err)
-//		return 0, []byte{}
-//	}
-//
-//	file, err := ioutil.TempFile(os.TempDir(), "vtportal." + convertInt64ToString(j.Id) + ".csv")
-//	defer os.Remove(file.Name())
-//	csvWriter := csv.NewWriter(file)
-//	csvWriter.Write([]string{"MD5", "Name", "Severities", "ScanDate"})
-//
-//	scanner := bufio.NewScanner(bytes.NewBuffer(data))
-//	total = 0
-//	var temp HashTe
-//	for scanner.Scan() {
-//		err = dbMap.SelectOne(&temp, "SELECT * FROM hash_te WHERE md5 = $1", strings.ToLower(scanner.Text()))
-//		if err != nil {
-//			continue
-//		}
-//
-//		total += 1
-//
-//		csvWriter.Write([]string{
-//			temp.Md5,
-//			temp.Name,
-//			temp.Severities,
-//			convertUnixTimeToString(temp.ScanDate)})
-//	}
-//
-//	csvWriter.Flush()
-//	bytes, err := readFile(file.Name())
-//	if err != nil {
-//		log.Errorf("Error reading temp CSV file: %v", err)
-//		return 0, []byte{}
-//	}
-//
-//	return total, bytes
-//}
-//
-//// Creates a CSV results file for URL jobs, also returns the total number and number of positive hashes
-//func (j *Job) GenerateJobCsvForUrls(dataFolder string) (total int,
-//positives int,
-//csvData []byte) {
-//	var temp Url
-//
-//	data, err := loadJobData(j.Id, dataFolder)
-//	if err != nil {
-//		log.Errorf("Error loading job data: %v", err)
-//		return 0, 0, []byte{}
-//	}
-//
-//	file, err := ioutil.TempFile(os.TempDir(), "vtportal." + convertInt64ToString(j.Id) + ".csv")
-//	defer os.Remove(file.Name())
-//	csvWriter := csv.NewWriter(file)
-//	csvWriter.Write([]string{"URL", "Permalink", "Positives", "Total", "ScanDate", "Scans"})
-//
-//	scanner := bufio.NewScanner(bytes.NewBuffer(data))
-//	var md5 string
-//	for scanner.Scan() {
-//		md5 = Md5EncodeString(scanner.Text())
-//		err = dbMap.SelectOne(&temp, "SELECT * FROM url WHERE url_md5 = $1", md5)
-//		if err != nil {
-//			continue
-//		}
-//
-//		total += 1
-//
-//		if temp.Positives > 1 {
-//			positives += 1
-//		}
-//
-//		csvWriter.Write([]string{
-//			temp.Url,
-//			temp.Permalink,
-//			strconv.Itoa(int(temp.Positives)),
-//			strconv.Itoa(int(temp.Total)),
-//			convertUnixTimeToString(temp.ScanDate),
-//			temp.Scans})
-//	}
-//
-//	csvWriter.Flush()
-//	bytes, _ := readFile(file.Name())
-//	if err != nil {
-//		return 0, 0, []byte{}
-//	}
-//
-//	return total, positives, bytes
-//}
-//
-//// Creates a CSV results file for URL jobs, also returns the total number and number of positive hashes
-//func (j *Job) GenerateJobCsvForUrlsG(dataFolder string) (total int, positives int, csvData []byte) {
-//	var temp UrlG
-//
-//	data, err := loadJobData(j.Id, dataFolder)
-//	if err != nil {
-//		log.Errorf("Error loading job data: %v", err)
-//		return 0, 0, []byte{}
-//	}
-//
-//	file, err := ioutil.TempFile(os.TempDir(), "vtportal." + convertInt64ToString(j.Id) + ".csv")
-//	defer os.Remove(file.Name())
-//	csvWriter := csv.NewWriter(file)
-//	csvWriter.Write([]string{"URL", "List"})
-//
-//	scanner := bufio.NewScanner(bytes.NewBuffer(data))
-//	var md5 string
-//	for scanner.Scan() {
-//		md5 = Md5EncodeString(scanner.Text())
-//		err = dbMap.SelectOne(&temp, "SELECT * FROM url_g WHERE url_md5 = $1", md5)
-//		if err != nil {
-//			continue
-//		}
-//
-//		total += 1
-//
-//		if len(temp.List) > 0 {
-//			positives += 1
-//		}
-//
-//		csvWriter.Write([]string{
-//			temp.Url,
-//			temp.List})
-//	}
-//
-//	csvWriter.Flush()
-//	bytes, _ := readFile(file.Name())
-//	if err != nil {
-//		return 0, 0, []byte{}
-//	}
-//
-//	return total, positives, bytes
-//}
-//
-//// Creates a CSV results file for IP jobs (Resolutions and Detected URL's), also returns the number resolved and number of detected URL's
-//func (j *Job) GenerateJobCsvForIps(dataFolder string) (numResolved int,
-//numDetectedUrls int,
-//csvDataResolutions []byte,
-//csvDataDetectedUrls []byte) {
-//
-//	data, err := loadJobData(j.Id, dataFolder)
-//	if err != nil {
-//		log.Errorf("Error loading job data: %v", err)
-//		return 0, 0, []byte{}, []byte{}
-//	}
-//
-//	file1, err := ioutil.TempFile(os.TempDir(), "vtportal." + convertInt64ToString(j.Id) + ".csv")
-//	defer os.Remove(file1.Name())
-//	csvWriter := csv.NewWriter(file1)
-//	csvWriter.Write([]string{"HostName", "LastResolved"})
-//
-//	scanner := bufio.NewScanner(bytes.NewBuffer(data))
-//	var tempRes []IpResolution
-//	for scanner.Scan() {
-//		ip, _ := InetAton(scanner.Text())
-//		err = dbMap.Select(&tempRes, "SELECT * FROM ip_resolution WHERE ip = $1", ip)
-//		if err != nil {
-//			continue
-//		}
-//
-//		for _, r := range tempRes {
-//			numResolved += 1
-//
-//			csvWriter.Write([]string{
-//				r.HostName,
-//				convertUnixTimeToString(r.LastResolved)})
-//		}
-//
-//		tempRes = nil
-//	}
-//	csvWriter.Flush()
-//
-//	file2, err := ioutil.TempFile(os.TempDir(), "vtportal." + convertInt64ToString(j.Id))
-//	defer os.Remove(file2.Name())
-//	csvWriter = csv.NewWriter(file2)
-//	csvWriter.Write([]string{"URL", "Positives", "Total", "ScanDate"})
-//
-//	scanner = bufio.NewScanner(bytes.NewBuffer(data))
-//	var tempUrls []IpDetectedUrl
-//	for scanner.Scan() {
-//		ip, _ := InetAton(scanner.Text())
-//		err = dbMap.Select(&tempUrls, "SELECT * FROM ip_detected_url WHERE ip = $1", ip)
-//		if err != nil {
-//			continue
-//		}
-//
-//		for _, u := range tempUrls {
-//			numDetectedUrls += 1
-//
-//			csvWriter.Write([]string{
-//				u.Url,
-//				strconv.Itoa(int(u.Positives)),
-//				strconv.Itoa(int(u.Total)),
-//				convertUnixTimeToString(u.ScanDate)})
-//		}
-//
-//		tempUrls = nil
-//	}
-//	csvWriter.Flush()
-//
-//	bytes1, _ := readFile(file1.Name())
-//	if err != nil {
-//		return  0, 0, []byte{}, []byte{}
-//	}
-//
-//	bytes2, _ := readFile(file2.Name())
-//	if err != nil {
-//		return  0, 0, []byte{}, []byte{}
-//	}
-//
-//	return numResolved, numDetectedUrls, bytes1, bytes2
-//}
-//
-//// Creates a CSV results file for IP jobs (Resolutions and Detected URL's), also returns the number resolved and number of detected URL's
-//func (j *Job) GenerateJobCsvForDomains(dataFolder string) (numResolved int,
-//numDetectedUrls int,
-//csvDataResolutions []byte,
-//csvDataDetectedUrls []byte) {
-//
-//	data, err := loadJobData(j.Id, dataFolder)
-//	if err != nil {
-//		log.Errorf("Error loading job data: %v", err)
-//		return 0, 0, []byte{}, []byte{}
-//	}
-//
-//	// Create the resolved CSV for the domains
-//	file1, err := ioutil.TempFile(os.TempDir(), "vtportal." + convertInt64ToString(j.Id) + ".csv")
-//	defer os.Remove(file1.Name())
-//	csvWriter := csv.NewWriter(file1)
-//	csvWriter.Write([]string{"Domain", "IPAddress", "LastResolved"})
-//
-//	scanner := bufio.NewScanner(bytes.NewBuffer(data))
-//	var tempRes []DomainResolution
-//	var md5 string
-//	var resolution DomainResolution
-//	for scanner.Scan() {
-//		md5 = Md5EncodeString(scanner.Text())
-//		err = dbMap.Select(&tempRes, "SELECT * FROM domain_resolution WHERE domain_md5 = $1", md5)
-//		if err != nil {
-//			fmt.Println(err.Error())
-//			continue
-//		}
-//
-//		for _, resolution = range tempRes {
-//			numResolved += 1
-//
-//			csvWriter.Write([]string{
-//				scanner.Text(),
-//				InetNtoa(resolution.IpAddress),
-//				convertUnixTimeToString(resolution.LastResolved)})
-//		}
-//
-//		tempRes = nil
-//	}
-//	csvWriter.Flush()
-//
-//	data, err = loadJobData(j.Id, dataFolder)
-//	if err != nil {
-//		log.Errorf("Error loading job data: %v", err)
-//		return 0, 0, []byte{}, []byte{}
-//	}
-//
-//	// Create the Detected URL's CSV for the domains
-//	file2, err := ioutil.TempFile(os.TempDir(), "vtportal." + convertInt64ToString(j.Id) + ".csv")
-//	defer os.Remove(file2.Name())
-//	csvWriter = csv.NewWriter(file2)
-//	csvWriter.Write([]string{"URL", "Positives", "Total", "ScanDate"})
-//
-//	scanner = bufio.NewScanner(bytes.NewBuffer(data))
-//	var tempUrls []DomainDetectedUrl
-//	var url DomainDetectedUrl
-//	for scanner.Scan() {
-//		md5 = Md5EncodeString(scanner.Text())
-//		err = dbMap.Select(&tempUrls, "SELECT * FROM domain_detected_url WHERE domain_md5 = $1", md5)
-//		if err != nil {
-//			continue
-//		}
-//
-//		for _, url = range tempUrls {
-//			numDetectedUrls += 1
-//
-//			csvWriter.Write([]string{
-//				url.Url,
-//				strconv.Itoa(int(url.Positives)),
-//				strconv.Itoa(int(url.Total)),
-//				convertUnixTimeToString(url.ScanDate)})
-//		}
-//
-//		tempUrls = nil
-//	}
-//	csvWriter.Flush()
-//
-//	bytes1, _ := readFile(file1.Name())
-//	if err != nil {
-//		return  0, 0, []byte{}, []byte{}
-//	}
-//
-//	bytes2, _ := readFile(file2.Name())
-//	if err != nil {
-//		return  0, 0, []byte{}, []byte{}
-//	}
-//
-//	return numResolved, numDetectedUrls, bytes1, bytes2
-//}
+// Creates a CSV results file for TE string jobs
+func (j *Job) OutputTeStrings(outputDir string) {
+
+	w := Work{}
+	data := w.GetAllWork()
+
+	file, err := os.Create(path.Join(outputDir, "lookuper-te-string.csv"));
+	defer file.Close()
+	if err != nil {
+		log.Fatalf("Error opening output file: %v (%s)", err, path.Join(outputDir, "lookuper-te-string.csv"))
+	}
+
+	csvWriter := csv.NewWriter(file)
+	csvWriter.Write([]string{"String", "Count", "UpdateDate"})
+
+	var temp TeString
+	for _, d := range data {
+
+		err = dbMap.SelectOne(&temp, "SELECT * FROM te_string WHERE LOWER(string) = $1", strings.ToLower(d))
+		if err != nil {
+			log.Printf("Error retrieving data for TE string output: %v", err)
+			break
+		}
+
+		csvWriter.Write([]string{
+			temp.String,
+			strconv.Itoa(int(temp.Count)),
+			util.ConvertInt64ToRfc3339String(temp.UpdateDate)})
+	}
+
+	csvWriter.Flush()
+}
+
+// Creates a CSV results file for TE string jobs
+func (j *Job) OutputGsb(outputDir string) {
+
+	w := Work{}
+	data := w.GetAllWork()
+
+	file, err := os.Create(path.Join(outputDir, "lookuper-gsb.csv"));
+	defer file.Close()
+	if err != nil {
+		log.Fatalf("Error opening output file: %v (%s)", err, path.Join(outputDir, "lookuper-gsb.csv"))
+	}
+
+	csvWriter := csv.NewWriter(file)
+	csvWriter.Write([]string{"URL", "Data"})
+
+	var gsb GoogleSafeBrowsing
+	var md5 string
+
+	for _, d := range data {
+
+		md5 = util.Md5HashString(d)
+		err = dbMap.SelectOne(&gsb, "SELECT * FROM google_safe_browsing WHERE url_md5 = $1", md5)
+		if err != nil {
+			continue
+		}
+
+		csvWriter.Write([]string{
+			gsb.Url,
+			gsb.Data})
+	}
+
+	csvWriter.Flush()
+}

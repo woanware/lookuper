@@ -43,6 +43,11 @@ func InetAton(ipAddr string) (uint32, error) {
 	return binary.BigEndian.Uint32(ip), nil
 }
 
+// Converts an integer representation of an IP address to string dotted notation
+func InetNtoa(ip uint32) string {
+	return fmt.Sprintf("%d.%d.%d.%d", byte(ip>>24), byte(ip>>16), byte(ip>>8), byte(ip))
+}
+
 /* RFC1918: IPV4 Private Networks (10.0.0.0/8, 192.168.0.0./16, 172.16.0.0/12)
 Should be used by initialising the variables below and then passing into the method to improve performance
 

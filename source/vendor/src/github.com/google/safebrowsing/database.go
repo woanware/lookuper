@@ -27,6 +27,11 @@ import (
 	pb "github.com/google/safebrowsing/internal/safebrowsing_proto"
 )
 
+// jitter is the maximum amount of time that we expect an API list update to
+// actually take. We add this time to the update period time to give some
+// leeway before declaring the database as stale.
+const jitter = 30 * time.Second
+
 // database tracks the state of the threat lists published by the Safe Browsing
 // API. Since the global blacklist is constantly changing, the contents of the
 // database needs to be periodically synced with the Safe Browsing servers in
@@ -96,7 +101,8 @@ func (db *database) Init(config *Config, logger *log.Logger) bool {
 		db.setError(errStale)
 		return false
 	}
-	if err := db.load(); err != nil {
+	dbf, err := loadDatabase(db.config.DBPath)
+	if err != nil {
 		db.log.Printf("load failure: %v", err)
 		db.setError(err)
 		return false
@@ -104,14 +110,14 @@ func (db *database) Init(config *Config, logger *log.Logger) bool {
 
 	// Validate that the database threat list stored on disk is at least a
 	// superset of the specified configuration.
-	if db.config.now().Sub(db.last) > db.config.UpdatePeriod {
+	if db.config.now().Sub(dbf.Time) > (db.config.UpdatePeriod + jitter) {
 		db.log.Printf("database loaded is stale")
 		db.setError(errStale)
 		return false
 	}
 	tfuNew := make(threatsForUpdate)
 	for _, td := range db.config.ThreatLists {
-		if row, ok := db.tfu[td]; ok {
+		if row, ok := dbf.Table[td]; ok {
 			tfuNew[td] = row
 		} else {
 			db.log.Printf("database configuration mismatch")
@@ -120,7 +126,7 @@ func (db *database) Init(config *Config, logger *log.Logger) bool {
 		}
 	}
 	db.tfu = tfuNew
-	db.generateThreatsForLookups(db.last)
+	db.generateThreatsForLookups(dbf.Time)
 	return true
 }
 
@@ -133,7 +139,7 @@ func (db *database) Status() error {
 	if db.err != nil {
 		return db.err
 	}
-	if db.config.now().Sub(db.last) > db.config.UpdatePeriod {
+	if db.config.now().Sub(db.last) > (db.config.UpdatePeriod + jitter) {
 		return errStale
 	}
 	return nil
@@ -195,15 +201,20 @@ func (db *database) Update(api api) {
 		db.setError(err)
 		return
 	}
+	dbf := databaseFormat{make(threatsForUpdate), last}
+	for td, phs := range db.tfu {
+		// Copy of partialHashes before generateThreatsForLookups clobbers it.
+		dbf.Table[td] = phs
+	}
+	db.generateThreatsForLookups(last)
 
 	// Regenerate the database and store it.
 	if db.config.DBPath != "" {
 		// Semantically, we ignore save errors, but we do log them.
-		if err := db.save(); err != nil {
+		if err := saveDatabase(db.config.DBPath, dbf); err != nil {
 			db.log.Printf("save failure: %v", err)
 		}
 	}
-	db.generateThreatsForLookups(last)
 }
 
 // Lookup looks up the full hash in the threat list and returns a partial
@@ -281,12 +292,10 @@ func (db *database) generateThreatsForLookups(last time.Time) {
 	}
 }
 
-// save saves the database threat list to a file.
-//
-// This assumes that the db.mu lock is already held.
-func (db *database) save() (err error) {
+// saveDatabase saves the database threat list to a file.
+func saveDatabase(path string, db databaseFormat) (err error) {
 	var file *os.File
-	file, err = os.Create(db.config.DBPath)
+	file, err = os.Create(path)
 	if err != nil {
 		return err
 	}
@@ -307,20 +316,18 @@ func (db *database) save() (err error) {
 	}()
 
 	encoder := gob.NewEncoder(gz)
-	if err = encoder.Encode(&databaseFormat{db.tfu, db.last}); err != nil {
+	if err = encoder.Encode(db); err != nil {
 		return err
 	}
 	return nil
 }
 
-// load loads the database state from a file.
-//
-// This assumes that the db.mu lock is already held.
-func (db *database) load() (err error) {
+// loadDatabase loads the database state from a file.
+func loadDatabase(path string) (db databaseFormat, err error) {
 	var file *os.File
-	file, err = os.Open(db.config.DBPath)
+	file, err = os.Open(path)
 	if err != nil {
-		return err
+		return db, err
 	}
 	defer func() {
 		if cerr := file.Close(); err == nil {
@@ -330,7 +337,7 @@ func (db *database) load() (err error) {
 
 	gz, err := gzip.NewReader(file)
 	if err != nil {
-		return err
+		return db, err
 	}
 	defer func() {
 		if zerr := gz.Close(); err == nil {
@@ -339,18 +346,15 @@ func (db *database) load() (err error) {
 	}()
 
 	decoder := gob.NewDecoder(gz)
-	dbState := new(databaseFormat)
-	if err = decoder.Decode(&dbState); err != nil {
-		return err
+	if err = decoder.Decode(&db); err != nil {
+		return db, err
 	}
-	for _, dv := range dbState.Table {
+	for _, dv := range db.Table {
 		if !bytes.Equal(dv.SHA256, dv.Hashes.SHA256()) {
-			return errors.New("safebrowsing: threat list SHA256 mismatch")
+			return db, errors.New("safebrowsing: threat list SHA256 mismatch")
 		}
 	}
-	db.tfu = dbState.Table
-	db.last = dbState.Time
-	return nil
+	return db, nil
 }
 
 // update updates the threat list according to the API response.

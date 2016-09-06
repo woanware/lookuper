@@ -37,6 +37,7 @@ type VtIpDetectedUrl struct {
 
 // Processes a VT API request for a single IP
 func (i *VtIpResolution) Process(data string) int8 {
+
 	ipr, err := i.govtc.GetIpReport(data)
 	if err != nil {
 		if strings.Contains(strings.ToLower(err.Error()), "unexpected status code: 204") {
@@ -55,10 +56,12 @@ func (i *VtIpResolution) Process(data string) int8 {
 }
 
 //
-func (i *VtIpResolution) DoesDataExist(data uint32, staleTimestamp time.Time) (error, bool) {
+func (i *VtIpResolution) DoesDataExist(data string, staleTimestamp time.Time) (error, bool) {
+
+	ip, _ := util.InetAton(data)
 
 	var ipRes VtIpResolution
-	err := dbMap.SelectOne(&ipRes, "SELECT * FROM vt_ip_resolution WHERE ip = $1", data)
+	err := dbMap.SelectOne(&ipRes, "SELECT * FROM vt_ip_resolution WHERE ip = $1 ORDER BY update_date DESC LIMIT 1", ip)
 	err, exists := validateDbData(ipRes.UpdateDate, staleTimestamp.Unix(), err)
 
 	return err, exists
@@ -66,6 +69,7 @@ func (i *VtIpResolution) DoesDataExist(data uint32, staleTimestamp time.Time) (e
 
 // Processes the VT response for a VT IP report
 func (i *VtIpResolution) processResponse(data string, ir *govt.IpReport) int8 {
+
 	for _, r := range ir.Resolutions {
 		if i.setRecordIr(data, r) == WORK_RESPONSE_ERROR {
 			return WORK_RESPONSE_ERROR
@@ -83,6 +87,7 @@ func (i *VtIpResolution) processResponse(data string, ir *govt.IpReport) int8 {
 
 // Inserts a new IP resolution record, if that fails due to it already existing, then retrieve details and update
 func (i *VtIpResolution) setRecordIr(ipAddress string, ir govt.IpResolution) int8 {
+
 	data := new(VtIpResolution)
 	i.updateObjectIr(ipAddress, data, ir)
 
@@ -112,6 +117,7 @@ func (i *VtIpResolution) setRecordIr(ipAddress string, ir govt.IpResolution) int
 
 // Inserts a new IP detected URL record, if that fails due to it already existing, then retrieve details and update
 func (i *VtIpResolution) setRecordIdu(ipAddress string, du govt.DetectedUrl) int8 {
+
 	data := new(VtIpDetectedUrl)
 	i.updateObjectIdu(ipAddress, data, du)
 
@@ -141,6 +147,7 @@ func (i *VtIpResolution) setRecordIdu(ipAddress string, du govt.DetectedUrl) int
 
 //
 func (i *VtIpResolution) updateObjectIr(ipAddress string, data *VtIpResolution, ip govt.IpResolution) {
+
 	temp, _ := util.InetAton(ipAddress)
 	data.Ip = int64(temp)
 	data.HostName = ip.Hostname
@@ -158,6 +165,7 @@ func (i *VtIpResolution) updateObjectIr(ipAddress string, data *VtIpResolution, 
 
 //
 func (i *VtIpResolution) updateObjectIdu(ipAddress string, data *VtIpDetectedUrl, du govt.DetectedUrl) {
+
 	temp, _ := util.InetAton(ipAddress)
 	data.Ip = temp
 	data.Url = du.Url

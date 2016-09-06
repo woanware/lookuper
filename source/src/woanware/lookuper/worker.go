@@ -51,6 +51,8 @@ func (w *Worker) Run(
 	apiKeys []string,
 	privateApiKeys bool) {
 
+	log.Printf("Data type: %s", dataTypes[dataType])
+
 	count, err := w.getWorkTableRecordCount()
 	if err != nil {
 		log.Printf("Error checking for existing work: %v", err)
@@ -138,6 +140,7 @@ func (w *Worker) Run(
 
 //
 func (w *Worker) loadJob() (int, []string, bool) {
+
 	j := Job{}
 	j.Load()
 
@@ -218,6 +221,7 @@ func (w *Worker) loadData(inputFile string) {
 
 //
 func (w *Worker) getWorkTableRecordCount() (int, error) {
+
 	var count int
 	err := dbMap.SelectOne(&count, "SELECT COUNT(1) as val FROM work")
 	if err != nil {
@@ -231,6 +235,7 @@ func (w *Worker) getWorkTableRecordCount() (int, error) {
 // by line. The line data is then validated against the "work" table and then the actual data specific table, only then
 // is an actual batch request performed against the target service
 func (w *Worker) process(apiKey string) int8 {
+
 	batchSize := 4
 	if w.privateApiKeys == true {
 		batchSize = 25
@@ -325,6 +330,7 @@ func (w *Worker) loadBatch(batchSize int) (BatchData) {
 
 // Generic method to determine if the data exists within the cached data
 func (w *Worker) doesDataExistInDb(staleTimestamp time.Time, data string) (error, bool) {
+
 	switch w.dataType {
 	case dataTypeMd5Vt:
 		vtHash := VtHash{govtc: w.govtc}
@@ -333,14 +339,11 @@ func (w *Worker) doesDataExistInDb(staleTimestamp time.Time, data string) (error
 		vtHash := VtHash{govtc: w.govtc}
 		return vtHash.DoesDataExist(false, data, staleTimestamp)
 	case dataTypeIpVt:
-		ip, _ := util.InetAton(data)
 		vtIpRes := VtIpResolution{govtc: w.govtc}
-		return vtIpRes.DoesDataExist(ip, staleTimestamp)
+		return vtIpRes.DoesDataExist(data, staleTimestamp)
 	case dataTypeDomainVt:
-		md5 := util.Md5HashString(data)
-		var temp VtDomainResolution
-		err := dbMap.SelectOne(&temp, "SELECT * FROM vt_domain_resolution WHERE domain_md5 = $1", md5)
-		return w.validateDbData(temp.UpdateDate, staleTimestamp.Unix(), err)
+		vtDomain := VtDomainResolution{govtc: w.govtc}
+		return vtDomain.DoesDataExist(data, staleTimestamp)
 	case dataTypeUrlVt:
 		md5 := util.Md5HashString(data)
 		var temp VtUrl
@@ -366,6 +369,7 @@ func (w *Worker) doesDataExistInDb(staleTimestamp time.Time, data string) (error
 
 // Determines if a "work" record exists for the data and the status is set to WORK_RESPONSE_NOT_PERFORMED
 func (w *Worker) hasWorkBeenCompleted(md5 string) (error, bool) {
+
 	var temp Work
 	err := dbMap.SelectOne(&temp, "SELECT * FROM work WHERE md5 = $1 and response_code = $2", md5, WORK_RESPONSE_NOT_PERFORMED)
 	if err != nil {
@@ -381,6 +385,7 @@ func (w *Worker) hasWorkBeenCompleted(md5 string) (error, bool) {
 
 // Determines if a "work" record exists for the data and the status is set to WORK_RESPONSE_NOT_PERFORMED
 func (w *Worker) doesWorkExist(md5 string) (error, bool) {
+
 	var id int
 	_, err := dbMap.Select(&id, "SELECT COUNT(1) FROM work WHERE md5 = $1", md5)
 	if err != nil {
@@ -415,6 +420,7 @@ func (w *Worker) validateDbData(updateDate int64, staleTimestamp int64, err erro
 // Controller method to perform the batches of data. The method calls the
 // appropriate method depending on the data type and the number in the batch
 func (w *Worker) processBatch(apiKey string, batch BatchData) int8 {
+
 	var response_code int8
 
 	attempts := 0
@@ -494,6 +500,7 @@ func (w *Worker) processBatch(apiKey string, batch BatchData) int8 {
 // If the job is using a public API key then we must pause between each HTTP request. Provides
 // a generic method and reduces the need for repeated logic checking in the other methods
 func (w *Worker) doPause(apiKey string) {
+
 	if w.privateApiKeys == false {
 		if apiKey == FAKE_API_KEY {
 			// This is a fake API key set for TE requests. Technically we
@@ -510,6 +517,7 @@ func (w *Worker) doPause(apiKey string) {
 
 // Retrieve a work record and updates the ResponseCode
 func (w *Worker) setWorkRecord(data string, responseCode int8) int8 {
+
 	work := new(Work)
 	md5 := util.Md5HashString(data)
 

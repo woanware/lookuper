@@ -53,8 +53,21 @@ func (d *VtDomainResolution) Process(data string) int8 {
 	return WORK_RESPONSE_OK
 }
 
+//
+func  (d *VtDomainResolution) DoesDataExist(data string, staleTimestamp time.Time) (error, bool) {
+
+	md5 := util.Md5HashString(data)
+
+	var dr VtDomainResolution
+	err := dbMap.SelectOne(&dr, "SELECT * FROM vt_domain_resolution WHERE domain_md5 = $1 ORDER BY update_date DESC LIMIT 1", strings.ToLower(md5))
+	err, exists := validateDbData(dr.UpdateDate, staleTimestamp.Unix(), err)
+
+	return err, exists
+}
+
 // Processes the VT response for a VT domain report
 func (d *VtDomainResolution) processResponse(data string, dr *govt.DomainReport) int8 {
+
 	for _, r := range dr.Resolutions {
 		if d.setRecordDr(data, r) == WORK_RESPONSE_ERROR {
 			return WORK_RESPONSE_ERROR
@@ -72,6 +85,7 @@ func (d *VtDomainResolution) processResponse(data string, dr *govt.DomainReport)
 
 // Inserts a new domain resolution record, if that fails due to it already existing, then retrieve details and update
 func (d *VtDomainResolution) setRecordDr(domain string, dr govt.DomainResolution) int8 {
+
 	data := new(VtDomainResolution)
 	d.updateObjectDr(domain, data, dr)
 
@@ -101,6 +115,7 @@ func (d *VtDomainResolution) setRecordDr(domain string, dr govt.DomainResolution
 
 // Inserts a new domain detected URL record, if that fails due to it already existing, then retrieve details and update
 func (d *VtDomainResolution) setRecordDdu(domain string, du govt.DetectedUrl) int8 {
+
 	data := new(VtDomainDetectedUrl)
 	d.updateObjectDdu(domain, data, du)
 
@@ -130,6 +145,7 @@ func (d *VtDomainResolution) setRecordDdu(domain string, du govt.DetectedUrl) in
 
 //
 func (d *VtDomainResolution) updateObjectDr(domain string, data *VtDomainResolution, dr govt.DomainResolution) {
+
 	data.DomainMd5 = strings.ToLower(util.Md5HashString(domain))
 	temp, _ := util.InetAton(dr.IpAddress)
 	data.IpAddress = temp
@@ -146,6 +162,7 @@ func (d *VtDomainResolution) updateObjectDr(domain string, data *VtDomainResolut
 
 //
 func (d *VtDomainResolution) updateObjectDdu(domain string, data *VtDomainDetectedUrl, du govt.DetectedUrl) {
+
 	data.DomainMd5 = strings.ToLower(util.Md5HashString(domain))
 	data.Url = du.Url
 	data.UrlMd5 = strings.ToLower(util.Md5HashString(du.Url))

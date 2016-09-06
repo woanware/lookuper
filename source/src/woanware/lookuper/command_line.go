@@ -132,7 +132,7 @@ func setupCli(app *cli.App) {
 				}
 
 				if len(config.VtApiKeys) > 0 {
-					run(dataTypeMd5Vt, c.String("input"), c.String("output"), config.VtApiKeys)
+					run(dataTypeMd5All, c.String("input"), c.String("output"), config.VtApiKeys)
 				} else {
 					success, apiKeys := getApiKeys(c.String("api"))
 					if success == false {
@@ -166,7 +166,7 @@ func setupCli(app *cli.App) {
 				}
 
 				if len(config.VtApiKeys) > 0 {
-					run(dataTypeMd5Vt, c.String("input"), c.String("output"), config.VtApiKeys)
+					run(dataTypeSha256Vt, c.String("input"), c.String("output"), config.VtApiKeys)
 				} else {
 					success, apiKeys := getApiKeys(c.String("api"))
 					if success == false {
@@ -200,7 +200,7 @@ func setupCli(app *cli.App) {
 				}
 
 				if len(config.VtApiKeys) > 0 {
-					run(dataTypeMd5Vt, c.String("input"), c.String("output"), config.VtApiKeys)
+					run(dataTypeIpVt, c.String("input"), c.String("output"), config.VtApiKeys)
 				} else {
 					success, apiKeys := getApiKeys(c.String("api"))
 					if success == false {
@@ -234,7 +234,7 @@ func setupCli(app *cli.App) {
 				}
 
 				if len(config.VtApiKeys) > 0 {
-					run(dataTypeMd5Vt, c.String("input"), c.String("output"), config.VtApiKeys)
+					run(dataTypeDomainVt, c.String("input"), c.String("output"), config.VtApiKeys)
 				} else {
 					success, apiKeys := getApiKeys(c.String("api"))
 					if success == false {
@@ -268,7 +268,7 @@ func setupCli(app *cli.App) {
 				}
 
 				if len(config.VtApiKeys) > 0 {
-					run(dataTypeMd5Vt, c.String("input"), c.String("output"), config.VtApiKeys)
+					run(dataTypeUrlVt, c.String("input"), c.String("output"), config.VtApiKeys)
 				} else {
 					success, apiKeys := getApiKeys(c.String("api"))
 					if success == false {

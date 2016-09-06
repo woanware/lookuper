@@ -10,19 +10,13 @@
 		{
 			"importpath": "github.com/PuerkitoBio/goquery",
 			"repository": "https://github.com/PuerkitoBio/goquery",
-			"revision": "7f4291566cf7cac3be222a933e01a2bed97532b1",
+			"revision": "152b1a2c8f5d0340f658bb656032a39b94e52958",
 			"branch": "master"
 		},
 		{
 			"importpath": "github.com/andybalholm/cascadia",
 			"repository": "https://github.com/andybalholm/cascadia",
-			"revision": "3ad29d1ad1c4f2023e355603324348cf1f4b2d48",
-			"branch": "master"
-		},
-		{
-			"importpath": "github.com/boltdb/bolt",
-			"repository": "https://github.com/boltdb/bolt",
-			"revision": "94c8db596809690a3f7046fa83c7b0dda13a3222",
+			"revision": "1c31af6f6c1a7b101ed05aacc7d8a738b43ae86e",
 			"branch": "master"
 		},
 		{
@@ -34,27 +28,27 @@
 		{
 			"importpath": "github.com/golang/protobuf/jsonpb",
 			"repository": "https://github.com/golang/protobuf",
-			"revision": "f592bd283e9ef86337a432eb50e592278c3d534d",
+			"revision": "1f49d83d9aa00e6ce4fc8258c71cc7786aec968a",
 			"branch": "master",
 			"path": "/jsonpb"
 		},
 		{
 			"importpath": "github.com/golang/protobuf/proto",
 			"repository": "https://github.com/golang/protobuf",
-			"revision": "f592bd283e9ef86337a432eb50e592278c3d534d",
+			"revision": "1f49d83d9aa00e6ce4fc8258c71cc7786aec968a",
 			"branch": "master",
 			"path": "/proto"
 		},
 		{
 			"importpath": "github.com/google/safebrowsing",
 			"repository": "https://github.com/google/safebrowsing",
-			"revision": "8330eb8fabf88ed7fdbd4fa84c541a1e42d20e50",
+			"revision": "c2df0f33af31470035c6adf857e60670d582374c",
 			"branch": "master"
 		},
 		{
 			"importpath": "github.com/mattn/go-sqlite3",
 			"repository": "https://github.com/mattn/go-sqlite3",
-			"revision": "c3e9588849195eefa783417c3a53d092f6e93526",
+			"revision": "e87c35082bf4c56768d8d7ed501396a9c166f0ff",
 			"branch": "master"
 		},
 		{
@@ -79,7 +73,7 @@
 		{
 			"importpath": "github.com/urfave/cli",
 			"repository": "https://github.com/urfave/cli",
-			"revision": "168c95418e66e019fe17b8f4f5c45aa62ff80e23",
+			"revision": "df95e0708f6416a3f148c984464cfd417e9eccfe",
 			"branch": "master"
 		},
 		{
@@ -91,20 +85,20 @@
 		{
 			"importpath": "github.com/woanware/goutil",
 			"repository": "https://github.com/woanware/goutil",
-			"revision": "e5622aad5a3f69d8348bad9103ab851d63bfc1db",
+			"revision": "b96695845286c0b583364db73a9a9e2a861f1632",
 			"branch": "master"
 		},
 		{
 			"importpath": "golang.org/x/net/html",
 			"repository": "https://go.googlesource.com/net",
-			"revision": "07b51741c1d6423d4a6abab1c49940ec09cb1aaf",
+			"revision": "1358eff22f0dd0c54fc521042cc607f6ff4b531a",
 			"branch": "master",
 			"path": "/html"
 		},
 		{
 			"importpath": "golang.org/x/net/idna",
 			"repository": "https://go.googlesource.com/net",
-			"revision": "07b51741c1d6423d4a6abab1c49940ec09cb1aaf",
+			"revision": "1358eff22f0dd0c54fc521042cc607f6ff4b531a",
 			"branch": "master",
 			"path": "/idna"
 		},
