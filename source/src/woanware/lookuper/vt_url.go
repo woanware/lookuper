@@ -60,25 +60,6 @@ func (u *VtUrl) Process(data []string) int8 {
 	}
 
 	return WORK_RESPONSE_OK
-
-	//	urr, err := u.govtc.GetUrlReports(data)
-	//	if err != nil {
-	//		if strings.Contains(strings.ToLower(err.Error()), "unexpected status code: 204") {
-	//			return WORK_RESPONSE_KEY_FAILED
-	//		}
-	//
-	//		log.Printf("Error requesting VT MD5 report: %v", err)
-	//		return WORK_RESPONSE_ERROR
-	//	}
-	//
-	//	for _, ur := range *urr {
-	//		if ur.ResponseCode == 1 {
-	//			u.setRecord(ur)
-	//		}
-	//	}
-	////}
-	//
-	//return WORK_RESPONSE_OK
 }
 
 //
