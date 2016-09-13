@@ -30,7 +30,14 @@ type VtHash struct {
 // Processes a VT API request for multiple hashes
 func(h *VtHash) Process(data []string) int8 {
 
-	frr, err := h.govtc.GetFileReports(data)
+	var err error
+	var fr *govt.FileReport
+	var frr *govt.FileReportResults
+	if len(data) == 1 {
+		fr, err = h.govtc.GetFileReport(data[0])
+	} else {
+		frr, err = h.govtc.GetFileReports(data)
+	}
 
 	if err != nil {
 		if strings.Contains(strings.ToLower(err.Error()), "unexpected status code: 204") {
@@ -41,9 +48,13 @@ func(h *VtHash) Process(data []string) int8 {
 		return WORK_RESPONSE_ERROR
 	}
 
-	for _, fr := range *frr {
-		if fr.ResponseCode == 1 {
-			h.setRecord(fr)
+	if len(data) == 1 {
+		h.setRecord(*fr)
+	} else {
+		for _, fr := range *frr {
+			if fr.ResponseCode == 1 {
+				h.setRecord(fr)
+			}
 		}
 	}
 

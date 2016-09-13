@@ -30,39 +30,55 @@ type VtUrl struct {
 
 // Processes a VT API request for a URL(s)
 func (u *VtUrl) Process(data []string) int8 {
-	//if isSingleItem == true {
-	//	ur, err := u.govtc.GetUrlReport(data[0])
-	//	if err != nil {
-	//		if strings.Contains(strings.ToLower(err.Error()), "unexpected status code: 204") {
-	//			return WORK_RESPONSE_KEY_FAILED
-	//		}
-	//
-	//		log.Printf("Error requesting VT URL report: %v", err)
-	//		return WORK_RESPONSE_ERROR
-	//	}
-	//
-	//	if ur.ResponseCode == 1 {
-	//		u.processUrlReport(ur)
-	//	}
-	//} else {
-		urr, err := u.govtc.GetUrlReports(data)
-		if err != nil {
-			if strings.Contains(strings.ToLower(err.Error()), "unexpected status code: 204") {
-				return WORK_RESPONSE_KEY_FAILED
-			}
 
-			log.Printf("Error requesting VT MD5 report: %v", err)
-			return WORK_RESPONSE_ERROR
+	var err error
+	var ur *govt.UrlReport
+	var urr *govt.UrlReports
+	if len(data) == 1 {
+		ur, err = u.govtc.GetUrlReport(data[0])
+	} else {
+		urr, err = u.govtc.GetUrlReports(data)
+	}
+
+	if err != nil {
+		if strings.Contains(strings.ToLower(err.Error()), "unexpected status code: 204") {
+			return WORK_RESPONSE_KEY_FAILED
 		}
 
+		log.Printf("Error requesting VT URL report: %v", err)
+		return WORK_RESPONSE_ERROR
+	}
+
+	if len(data) == 1 {
+		u.setRecord(*ur)
+	} else {
 		for _, ur := range *urr {
 			if ur.ResponseCode == 1 {
 				u.setRecord(ur)
 			}
 		}
-	//}
+	}
 
 	return WORK_RESPONSE_OK
+
+	//	urr, err := u.govtc.GetUrlReports(data)
+	//	if err != nil {
+	//		if strings.Contains(strings.ToLower(err.Error()), "unexpected status code: 204") {
+	//			return WORK_RESPONSE_KEY_FAILED
+	//		}
+	//
+	//		log.Printf("Error requesting VT MD5 report: %v", err)
+	//		return WORK_RESPONSE_ERROR
+	//	}
+	//
+	//	for _, ur := range *urr {
+	//		if ur.ResponseCode == 1 {
+	//			u.setRecord(ur)
+	//		}
+	//	}
+	////}
+	//
+	//return WORK_RESPONSE_OK
 }
 
 //
@@ -78,6 +94,7 @@ func (u *VtUrl) DoesDataExist(data string, staleTimestamp time.Time) (error, boo
 
 // Inserts a new URL record, if that fails due to it already existing, then retrieve details and update
 func (u *VtUrl) setRecord(ur govt.UrlReport) int8 {
+
 	data := new(VtUrl)
 	u.updateObject(data, ur)
 
@@ -107,6 +124,7 @@ func (u *VtUrl) setRecord(ur govt.UrlReport) int8 {
 
 // Generic method to copy the VT data to our URL object
 func (u *VtUrl) updateObject(url *VtUrl, ur govt.UrlReport) {
+
 	url.Url = ur.Resource
 	url.UrlMd5 = strings.ToLower(util.Md5HashString(ur.Resource))
 	url.Positives = int16(ur.Positives)
@@ -126,6 +144,7 @@ func (u *VtUrl) updateObject(url *VtUrl, ur govt.UrlReport) {
 
 // Creates a comma delimited string with the scan engine and the result/malware/virus
 func (u *VtUrl) generateUrlScansString(fs map[string]govt.UrlScan) string {
+
 	// We need to sort the keys first, since the iteration is actually random if not
 	var keys []string
 	for e, s := range fs {
