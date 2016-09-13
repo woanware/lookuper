@@ -21,7 +21,7 @@ type TeString struct {
 	UpdateDate	int64 	`db:"update_date"`
 }
 
-// ##### Methods #######################################################################################################
+// ##### Public Methods ################################################################################################
 
 // Processes a TE request for a single string
 func (s *TeString) Process(data string) int8 {
@@ -72,6 +72,8 @@ func (s *TeString) DoesDataExist(data string, staleTimestamp time.Time) (error, 
 
 	return err, exists
 }
+
+// ##### Private Methods ###############################################################################################
 
 // Processes the TE response for a string
 func (s *TeString) processResponse(data string, body string) int8 {
