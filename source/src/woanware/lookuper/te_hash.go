@@ -113,7 +113,7 @@ func (h *TeHash) setHashTeRecord(md5 string, name string, severities string, sub
 			return WORK_RESPONSE_ERROR
 		}
 
-		err := dbMap.SelectOne(hash, "SELECT * FROM hash_te WHERE md5 = $1", strings.ToLower(hash.Md5))
+		err := dbMap.SelectOne(hash, "SELECT * FROM te_hash WHERE md5 = $1", strings.ToLower(hash.Md5))
 		if err != nil {
 			log.Printf("Error retrieving TE hash record: %v", err)
 			return WORK_RESPONSE_ERROR
