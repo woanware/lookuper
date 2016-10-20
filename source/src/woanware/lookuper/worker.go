@@ -51,8 +51,6 @@ func (w *Worker) Run(
 	apiKeys []string,
 	privateApiKeys bool) {
 
-	log.Printf("Data type: %s", dataTypes[dataType])
-
 	count, err := w.getWorkTableRecordCount()
 	if err != nil {
 		log.Printf("Error checking for existing work: %v", err)
@@ -258,11 +256,16 @@ func (w *Worker) process(apiKey string) int8 {
 
 	var responseCode int8
 	var batchData BatchData
-
+	var percent float64
 	for  {
 		batchData = w.loadBatch(batchSize)
 		if len(batchData.Items) == 0 {
-			break
+			break	
+		}
+
+		if w.numberComplete % 5 == 0 {		
+		 	percent = float64(w.numberComplete) * float64(100)  / float64(w.numberTotal) 
+		 	log.Printf("Percent Complete: %d", int(percent))
 		}
 
 		responseCode =  w.processBatch(apiKey, batchData)
