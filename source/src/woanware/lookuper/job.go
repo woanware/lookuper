@@ -369,7 +369,7 @@ func (j *Job) OutputTeStrings(outputDir string) {
 	var temp TeString
 	for _, d := range data {
 
-		err = dbMap.SelectOne(&temp, "SELECT * FROM te_string WHERE LOWER(string) = $1", strings.ToLower(d))
+		err = dbMap.SelectOne(&temp, "SELECT * FROM te_string WHERE string = $1", strings.ToLower(d))
 		if err != nil {
 			if strings.Contains(strings.ToLower(err.Error()), "no rows in result set") == false {
 				log.Printf("Error retrieving data for TE string output: %v", err)

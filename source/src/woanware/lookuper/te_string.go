@@ -67,7 +67,7 @@ func (s *TeString) Process(data string) int8 {
 func (s *TeString) DoesDataExist(data string, staleTimestamp time.Time) (error, bool) {
 
 	var temp TeString
-	err := dbMap.SelectOne(&temp, "SELECT * FROM te_string WHERE string = $1", data)
+	err := dbMap.SelectOne(&temp, "SELECT * FROM te_string WHERE string = $1", strings.ToLower(data))
 	err, exists := validateDbData(temp.UpdateDate, staleTimestamp.Unix(), err)
 
 	return err, exists
@@ -77,6 +77,7 @@ func (s *TeString) DoesDataExist(data string, staleTimestamp time.Time) (error, 
 
 // Processes the TE response for a string
 func (s *TeString) processResponse(data string, body string) int8 {
+
 	regexMatch := regexTeStringMatch.FindAllStringSubmatch(string(body), -1)
 	if regexMatch == nil {
 		log.Printf("No regex match in TE string report")
@@ -88,6 +89,7 @@ func (s *TeString) processResponse(data string, body string) int8 {
 
 // Inserts a new TE string record, if that fails due to it already existing, then retrieve details and update
 func (s *TeString) setRecord(data string, count int) int8 {
+
 	stringTe := new(TeString)
 	s.updateObject(stringTe, data, count)
 
@@ -98,7 +100,7 @@ func (s *TeString) setRecord(data string, count int) int8 {
 			return WORK_RESPONSE_ERROR
 		}
 
-		err := dbMap.SelectOne(stringTe, "SELECT * FROM te_string WHERE string = $1", strings.ToLower(stringTe.String))
+		err := dbMap.SelectOne(stringTe, "SELECT * FROM te_string WHERE string = $1", stringTe.String)
 		if err != nil {
 			log.Printf("Error retrieving TE string record: %v", err)
 			return WORK_RESPONSE_ERROR
@@ -121,7 +123,7 @@ func (s *TeString) updateObject(
 	data string,
 	count int) {
 
-	stringTe.String = data
+	stringTe.String = strings.ToLower(data)
 	stringTe.Count = count
 	stringTe.UpdateDate = time.Now().UTC().Unix()
 }
