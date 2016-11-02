@@ -264,8 +264,10 @@ func (w *Worker) process(apiKey string) int8 {
 		}
 
 		if w.numberComplete % 5 == 0 {		
-		 	percent = float64(w.numberComplete) * float64(100)  / float64(w.numberTotal) 
-		 	log.Printf("Percent Complete: %d", int(percent))
+		 	percent = float64(w.numberComplete) * float64(100)  / float64(w.numberTotal)
+			if percent != 0 {
+				log.Printf("Percent Complete: %d", int(percent))
+			}
 		}
 
 		responseCode =  w.processBatch(apiKey, batchData)
