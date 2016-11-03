@@ -39,7 +39,11 @@ func InetAton(ipAddr string) (uint32, error) {
 	if ip == nil {
 		return 0, errors.New("Wrong IP address format")
 	}
-	ip = ip.To4()
+
+	if ip.To4() == nil {
+		return 0, errors.New("Wrong IP address format (IPv6")
+	}
+
 	return binary.BigEndian.Uint32(ip), nil
 }
 
