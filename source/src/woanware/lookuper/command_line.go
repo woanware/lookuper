@@ -310,5 +310,28 @@ func setupCli(app *cli.App) {
 				apiFlag,
 			},
 		},
+		{
+			Name:    "hibp",
+			Usage:   "Check email addresses via HaveIBeenPwned",
+			Action:  func(c *cli.Context) error {
+
+				err := checkInputFile(c.String("input"))
+				if err != nil {
+					return err
+				}
+
+				err = checkOutputDirectory(c.String("output"))
+				if err != nil {
+					return err
+				}
+
+				run(dataTypeHibp, c.String("input"), c.String("output"), []string{FAKE_API_KEY3})
+				return nil
+			},
+			Flags: []cli.Flag{
+				inputFileFlag,
+				outputDirFlag,
+			},
+		},
 	}
 }

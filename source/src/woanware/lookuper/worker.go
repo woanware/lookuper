@@ -247,7 +247,8 @@ func (w *Worker) process(apiKey string) int8 {
 		w.dataType != dataTypeSha256Vt ||
 		w.dataType == dataTypeMd5Te ||
 		w.dataType == dataTypeStringTe ||
-		w.dataType == dataTypeGsb {
+		w.dataType == dataTypeGsb ||
+		w.dataType == dataTypeHibp {
 
 		batchSize = 1
 	}
@@ -361,6 +362,8 @@ func (w *Worker) doesDataExistInDb(staleTimestamp time.Time, data string) (error
 	case dataTypeGsb:
 		gsb := GoogleSafeBrowsing{}
 		return gsb.DoesDataExist(data, staleTimestamp)
+	case dataTypeHibp:
+		return nil, false
 	}
 
 	return nil, false
@@ -450,6 +453,9 @@ func (w *Worker) processBatch(apiKey string, batch BatchData) int8 {
 			case dataTypeGsb:
 				gsb := GoogleSafeBrowsing{}
 				response_code = gsb.Process(batch.Items[0])
+			case dataTypeHibp:
+				hibp := HaveIBeenPwned{}
+				response_code = hibp.Process(batch.Items[0])
 			}
 		} else {
 			switch w.dataType {
@@ -507,6 +513,9 @@ func (w *Worker) doPause(apiKey string) {
 			time.Sleep(500 * time.Millisecond)
 		} else if apiKey == FAKE_API_KEY2 {
 			// This is a fake API key set for Google SB requests.
+		} else if apiKey == FAKE_API_KEY3 {
+			// This is a fake API key set for HIBP requests.
+			time.Sleep(1600 * time.Millisecond)
 		} else {
 			// VT pause is about 15 seconds so we give a pause of 17 to be on the safe side
 			time.Sleep(17 * time.Second)

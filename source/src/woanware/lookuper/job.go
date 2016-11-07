@@ -73,6 +73,9 @@ func (j *Job) GenerateCsv(outputFilePath string) {
 
 	case dataTypeGsb:
 		j.OutputGsb(outputFilePath)
+
+	case dataTypeHibp:
+		j.OutputHibp(outputFilePath)
 	}
 }
 
@@ -418,6 +421,41 @@ func (j *Job) OutputGsb(outputDir string) {
 		csvWriter.Write([]string{
 			gsb.Url,
 			gsb.Data})
+	}
+
+	csvWriter.Flush()
+}
+
+// Creates a CSV results file for HIBP jobs
+func (j *Job) OutputHibp(outputDir string) {
+
+	w := Work{}
+	data := w.GetAllWork()
+
+	file, err := os.Create(path.Join(outputDir, "lookuper-hibp.csv"));
+	defer file.Close()
+	if err != nil {
+		log.Fatalf("Error opening output file: %v (%s)", err, path.Join(outputDir, "lookuper-hibp.csv"))
+	}
+
+	csvWriter := csv.NewWriter(file)
+	csvWriter.Write([]string{"Email", "Breaches"})
+
+	var hibp HaveIBeenPwned
+
+	for _, d := range data {
+
+		err = dbMap.SelectOne(&hibp, "SELECT * FROM hibp WHERE email = $1", strings.ToLower(d))
+		if err != nil {
+			if strings.Contains(strings.ToLower(err.Error()), "no rows in result set") == false {
+				log.Printf("Error retrieving data for HIBP output: %v", err)
+			}
+			continue
+		}
+
+		csvWriter.Write([]string{
+			hibp.Email,
+			hibp.Breaches})
 	}
 
 	csvWriter.Flush()

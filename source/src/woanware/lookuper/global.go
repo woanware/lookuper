@@ -10,6 +10,7 @@ const (
 	dataTypeMd5Te 		= 6
 	dataTypeStringTe 	= 7
 	dataTypeGsb 		= 8 // Google SafeBrowsing
+	dataTypeHibp 		= 9 // HaveIBeenPwned
 )
 
 // String values for the job data types
@@ -22,6 +23,7 @@ var dataTypes = []string{
 	dataTypeMd5Te: "MD5 (TE)",
 	dataTypeStringTe: "String (TE)",
 	dataTypeGsb: "Google Safe Browsing",
+	dataTypeHibp: "HaveIBeenPwned",
 }
 
 // Response codes for use in the "work" table
@@ -41,3 +43,6 @@ const FAKE_API_KEY string = "AAAABBBBCCCCEEEEFFFF0000111122223333444455556666777
 
 // Used for Google SafeBrowsing
 const FAKE_API_KEY2 string = "AAAABBBBCCCCEEEEFFFF0000111122223333444455556666777788889999AAAB"
+
+// Used for HIBP
+const FAKE_API_KEY3 string = "AAAABBBBCCCCEEEEFFFF0000111122223333444455556666777788889999AABC"

@@ -46,6 +46,12 @@
 			"branch": "master"
 		},
 		{
+			"importpath": "github.com/infoassure/go-haveibeenpwned",
+			"repository": "https://github.com/infoassure/go-haveibeenpwned",
+			"revision": "80b3d7c569723892e98e125284881ede209f0915",
+			"branch": "master"
+		},
+		{
 			"importpath": "github.com/mattn/go-sqlite3",
 			"repository": "https://github.com/mattn/go-sqlite3",
 			"revision": "e87c35082bf4c56768d8d7ed501396a9c166f0ff",

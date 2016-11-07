@@ -29,7 +29,7 @@ var (
 // ##### Constants ############################################################
 
 const APP_NAME string = "lookuper"
-const APP_VERSION string = "0.0.6"
+const APP_VERSION string = "0.0.7"
 const DB_FILE_NAME string = "./lookuper.db"
 const CONFIG_FILE_NAME string = "./lookuper.config"
 
@@ -113,6 +113,8 @@ func initialiseDb() (*gorp.DbMap) {
 	dbMap.AddTableWithName(TeHash{}, "te_hash").SetKeys(true, "id")
 	dbMap.AddTableWithName(TeString{}, "te_string").SetKeys(true, "id")
 	dbMap.AddTableWithName(VtUrl{}, "vt_url").SetKeys(true, "id")
+	dbMap.AddTableWithName(VtUrl{}, "vt_url").SetKeys(true, "id")
+	dbMap.AddTableWithName(HaveIBeenPwned{}, "hibp").SetKeys(true, "id")
 	dbMap.AddTableWithName(GoogleSafeBrowsing{}, "google_safe_browsing").SetKeys(true, "id")
 	dbMap.AddTableWithName(VtIpResolution{}, "vt_ip_resolution").SetKeys(true, "id")
 	dbMap.AddTableWithName(VtIpDetectedUrl{}, "vt_ip_detected_url").SetKeys(true, "id")
