@@ -120,9 +120,10 @@ const SQL_CREATE_TABLE_GOOGLE_SAFE_BROWSING string =
 
 const SQL_CREATE_TABLE_HIBP string =
 	`CREATE TABLE "hibp" (
-		'id'		INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-		'email'		text NOT NULL,
-		'breaches'	text
+		'id'			INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+		'email'			text NOT NULL,
+		'breaches'		text,
+		'update_date'	bigint
 	);`
 
 const SQL_CREATE_INDEX_WORK string =

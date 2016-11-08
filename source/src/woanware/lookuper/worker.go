@@ -287,7 +287,7 @@ func (w *Worker) loadBatch(batchSize int) (BatchData) {
 	var data string
 	var ret bool
 
-	staleTimestamp := time.Now().UTC().Add(-time.Duration(24*config.MaxHashAge) * time.Hour)
+	staleTimestamp := time.Now().UTC().Add(-time.Duration(24*config.MaxDataAge) * time.Hour)
 
 	workData := make(map[string]int8)
 
@@ -363,7 +363,8 @@ func (w *Worker) doesDataExistInDb(staleTimestamp time.Time, data string) (error
 		gsb := GoogleSafeBrowsing{}
 		return gsb.DoesDataExist(data, staleTimestamp)
 	case dataTypeHibp:
-		return nil, false
+		hibp := HaveIBeenPwned{}
+		return hibp.DoesDataExist(data, staleTimestamp)
 	}
 
 	return nil, false

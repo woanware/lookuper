@@ -158,8 +158,8 @@ func loadConfig() (*Config) {
 		log.Fatalf("Error unmarshalling the config file: %v", err)
 	}
 
-	if c.MaxHashAge == 0 {
-		c.MaxHashAge = 30
+	if c.MaxDataAge == 0 {
+		c.MaxDataAge = 30
 	}
 
 	if c.Retries == 0 {

@@ -1,17 +1,18 @@
 # lookuper
 
-**lookuper** performs lookups against VirusTotal/ThreatExpert/Google Safe Browsing data for data types such as MD5, SHA256, URL, IP, Domains, Strings e.g. mutexes
+**lookuper** performs lookups against VirusTotal/ThreatExpert/Google Safe Browsing/HaveIBeenPnwed data for data types such as MD5, SHA256, URL, IP, Domains, Strings, Mutexes and email addresses
 
 Data is cached in a local SQLite database. The VirusTotal functionality supports multiple API keys, so you can supply four public API keys and it will run continuously, iterating through the API keys.
 
 ## Features
 
 - Data caching in SQLite database
-- Support for multiple API keys
-- Batched requesting
-- Supports hashes (MD5 & SHA256), URL's, IP's and domains from VirusTotal
-- Supports hashes (MD5, strings) from ThreatExpert
-- Supports domains/URL's from Google SafeBrowsing
+- Support for multiple API keys (VT)
+- Batched requesting (VT)
+- Supports hashes (MD5 & SHA256), URL's, IP's and domains from VirusTotal (https://www.virustotal.com/en/documentation/public-api/)
+- Supports hashes (MD5, strings) from ThreatExpert (http://www.threatexpert.com/)
+- Supports domains/URL's from Google SafeBrowsing (https://developers.google.com/safe-browsing/v4/)
+- Supports email addresses from HaveIBeenPwned (https://haveibeenpwned.com/API/v2)
 
 ## Configuration
 
@@ -34,7 +35,7 @@ virus_total_api_keys:
 - BBB...
 - CCC...
 - DDD...
-max_hash_age: 30
+max_data_age: 30
 ```
 
 ## Command Line
@@ -48,7 +49,7 @@ USAGE:
    lookuper [global options] command [command options] [arguments...]
 
 VERSION:
-   0.0.1
+   0.0.7
 
 AUTHOR(S):
    Mark Woan <markwoan@gmail.com>
@@ -64,6 +65,7 @@ COMMANDS:
      urlvt     Check URL's via VirusTotal
      stringte  Check strings via ThreatExpert
      gsb       Check Url's/Domains via Google Safe Browsing
+     hibp      Check email addresses via HaveIBeenPwned
      help, h   Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:

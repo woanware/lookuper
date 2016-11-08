@@ -14,6 +14,7 @@ type HaveIBeenPwned struct {
 	Id         	int64	`db:"id"`
 	Email      	string	`db:"email"`
 	Breaches	string	`db:"breaches"`
+	UpdateDate	int64 	`db:"update_date"`
 }
 
 // ##### Public Methods ################################################################################################
@@ -23,20 +24,19 @@ func (h *HaveIBeenPwned) Process(data string) int8 {
 
 	var c hibp.HibpClient
 
-	log.Printf("%v", data)
-
 	err, resp, breaches := c.BreachesForAccount(data, "", true)
 	if err != nil {
 		if err.Error() == "EOF" {
+			// EOF means that there is no data on that account
 			return WORK_RESPONSE_OK
 		}
 
-		log.Printf("HIBP response status1: %v (%s)", err, data)
+		log.Printf("Error retrieving HIBP response: %v (%s)", err, data)
 		return WORK_RESPONSE_ERROR
 	}
 
 	if len(resp) > 0 {
-		log.Printf("HIBP response status2: %v (%s)", resp, data)
+		log.Printf("Error retrieving HIBP response: %v (%s)", resp, data)
 		return WORK_RESPONSE_ERROR
 	}
 
@@ -46,18 +46,19 @@ func (h *HaveIBeenPwned) Process(data string) int8 {
 
 	temp := make([]string, 0)
 	for _, b := range *breaches {
-		log.Printf("N: %v", b.Name)
 		temp = append(temp, strings.TrimSpace(b.Name))
 	}
-
-	log.Printf("%v", temp)
 
 	return h.setRecord(data, strings.Join(temp, ","))
 }
 
 //
 func (h *HaveIBeenPwned) DoesDataExist(data string, staleTimestamp time.Time) (error, bool) {
-	return nil, false
+	var temp HaveIBeenPwned
+	err := dbMap.SelectOne(&temp, "SELECT * FROM hibp WHERE email = $1", strings.ToLower(data))
+	err, exists := validateDbData(temp.UpdateDate, staleTimestamp.Unix(), err)
+
+	return err, exists
 }
 
 // ##### Private Methods ###############################################################################################
@@ -105,6 +106,7 @@ func (h *HaveIBeenPwned) updateObject(
 
 	hibp.Email = strings.ToLower(email)
 	hibp.Breaches = breaches
+	hibp.UpdateDate = time.Now().UTC().Unix()
 }
 
 
