@@ -111,7 +111,14 @@ func (j *Job) OutputVtHashes(outputDir string, isSha256 bool) {
 		if err != nil {
 			if strings.Contains(strings.ToLower(err.Error()), "no rows in result set") == false {
 				log.Printf("Error retrieving data for VT hash output: %v", err)
+			} else {
+				if isSha256 == true {
+					csvWriter.Write([]string{"NO DATA", d, "NO DATA", "NO DATA", "NO DATA", "NO DATA", "NO DATA"})
+				} else {
+					csvWriter.Write([]string{d, "NO DATA", "NO DATA", "NO DATA", "NO DATA", "NO DATA", "NO DATA"})
+				}
 			}
+
 			continue
 		}
 
@@ -153,7 +160,10 @@ func (j *Job) OutputVtUrls(outputDir string) {
 		if err != nil {
 			if strings.Contains(strings.ToLower(err.Error()), "no rows in result set") == false {
 				log.Printf("Error retrieving data for VT URL output: %v", err)
+			} else {
+				csvWriter.Write([]string{d, "NO DATA", "NO DATA", "NO DATA", "NO DATA", "NO DATA"})
 			}
+
 			continue
 		}
 
@@ -195,6 +205,7 @@ func (j *Job) OutputVtIps(outputDir string) {
 			if strings.Contains(strings.ToLower(err.Error()), "no rows in result set") == false {
 				log.Printf("Error retrieving data for VT IP resolution output: %v", err)
 			}
+
 			continue
 		}
 
@@ -226,7 +237,10 @@ func (j *Job) OutputVtIps(outputDir string) {
 		if err != nil {
 			if strings.Contains(strings.ToLower(err.Error()), "no rows in result set") == false {
 				log.Printf("Error retrieving data for VT IP detected URL output: %v", err)
+			} else {
+				csvWriter.Write([]string{d2, "NO DATA", "NO DATA", "NO DATA"})
 			}
+
 			continue
 		}
 
@@ -301,7 +315,10 @@ func (j *Job) OutputVtDomains(outputDir string) {
 		if err != nil {
 			if strings.Contains(strings.ToLower(err.Error()), "no rows in result set") == false {
 				log.Printf("Error retrieving data for VT domain detected URL output: %v", err)
+			} else {
+				csvWriter.Write([]string{d2, "NO DATA", "NO DATA", "NO DATA"})
 			}
+
 			continue
 		}
 
@@ -340,7 +357,10 @@ func (j *Job) OutputTeHashes(outputDir string) {
 		if err != nil {
 			if strings.Contains(strings.ToLower(err.Error()), "no rows in result set") == false {
 				log.Printf("Error retrieving data for TE hash output: %v", err)
+			} else {
+				csvWriter.Write([]string{d, "NO DATA", "NO DATA", "NO DATA"})
 			}
+
 			continue
 		}
 
@@ -376,7 +396,10 @@ func (j *Job) OutputTeStrings(outputDir string) {
 		if err != nil {
 			if strings.Contains(strings.ToLower(err.Error()), "no rows in result set") == false {
 				log.Printf("Error retrieving data for TE string output: %v", err)
+			} else {
+				csvWriter.Write([]string{d, "NO DATA", "NO DATA"})
 			}
+
 			continue
 		}
 
@@ -414,7 +437,10 @@ func (j *Job) OutputGsb(outputDir string) {
 		if err != nil {
 			if strings.Contains(strings.ToLower(err.Error()), "no rows in result set") == false {
 				log.Printf("Error retrieving data for Google Safe Browsing output: %v", err)
+			} else {
+				csvWriter.Write([]string{d, "NO DATA"})
 			}
+
 			continue
 		}
 
@@ -449,7 +475,10 @@ func (j *Job) OutputHibp(outputDir string) {
 		if err != nil {
 			if strings.Contains(strings.ToLower(err.Error()), "no rows in result set") == false {
 				log.Printf("Error retrieving data for HIBP output: %v", err)
+			} else {
+				csvWriter.Write([]string{d, "NO DATA"})
 			}
+
 			continue
 		}
 

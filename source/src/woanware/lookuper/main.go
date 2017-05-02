@@ -29,7 +29,7 @@ var (
 // ##### Constants ############################################################
 
 const APP_NAME string = "lookuper"
-const APP_VERSION string = "0.0.7"
+const APP_VERSION string = "0.0.8"
 const DB_FILE_NAME string = "./lookuper.db"
 const CONFIG_FILE_NAME string = "./lookuper.config"
 
